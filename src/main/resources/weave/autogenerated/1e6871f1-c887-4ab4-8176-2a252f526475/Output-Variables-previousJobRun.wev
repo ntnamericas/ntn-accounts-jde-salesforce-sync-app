@@ -1,5 +1,0 @@
-%dw 2.0
-
-type auto_1e6871f1_c887_4ab4_8176_2a252f526475_Output_Variables_previousJobRun = {|  |} {"typeId": "java.io.Serializable",
-"typeAlias": "Serializable"}
-
