@@ -1,0 +1,11 @@
+%dw 2.0
+
+type auto_8623697a_4a0d_47e9_b2e8_97200c2f6e3c_Output_Variables_F03012table = Array<{ _?: java_lang_Object {"class": "java.lang.Object",
+  "typeAlias": "Object",
+  "typeId": "java.lang.Object"} }>
+type java_lang_Object = {|  |} {"class": "java.lang.Object",
+"typeAlias": "Object",
+"typeId": "java.lang.Object"}
+
+
+
