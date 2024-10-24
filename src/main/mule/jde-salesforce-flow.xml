@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:secure-properties="http://www.mulesoft.org/schema/mule/secure-properties"
+	xmlns:tracking="http://www.mulesoft.org/schema/mule/ee/tracking"
+	xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
+	xmlns:os="http://www.mulesoft.org/schema/mule/os"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
+http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking-ee.xsd
+http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/schema/mule/secure-properties/current/mule-secure-properties.xsd">
+	<flow name="jde-to-sf-flow"
+		doc:id="6bd6fd27-e7b2-48b6-9128-7a289f8a1160" tracking:enable-default-events="true">
+		<scheduler doc:name="Scheduler" doc:id="ec6d4725-fd5c-475e-865e-cbf70c9be8b0" >
+			<scheduling-strategy >
+				<fixed-frequency frequency="${scheduler.frequency}" timeUnit="MINUTES" startDelay="${scheduler.startDelay}"/>
+			</scheduling-strategy>
+		</scheduler>
+		<ee:transform doc:name="jobRunTime"
+			doc:id="9a2b07dd-5ff1-4bc4-b69f-57355df21773">
+			<ee:message />
+			<ee:variables>
+				<ee:set-variable resource="dwl/vars-jobRun.dwl" variableName="jobRun" />
+			</ee:variables>
+		</ee:transform>
+		<logger level="INFO" doc:name="jobRun logger" doc:id="54482bd7-6269-4bea-b2a1-f8b4ecc28bcf" message="#[vars.jobRun]" category="${log.category}"/>
+		<os:retrieve doc:name="retrievePreviousJobRun"
+			doc:id="58f9cd3c-67fc-46af-8e45-f31831aa8bb5" key="previousJobRun"
+			target="previousJobRun" objectStore="Object_store_Previous_Job_Run">
+			<os:default-value><![CDATA[#[vars.jobRun]]]></os:default-value>
+		</os:retrieve>
+		<logger level="INFO" doc:name="Logger" doc:id="642c7f5b-d720-4986-a517-914ebb74cef4" message='Calling "jde-to-sf-app-sub-flow"' category="${log.category}"/>
+		<flow-ref doc:name="jde-to-sf-app-sub-flow"
+			doc:id="b264356f-83ed-4901-946c-e20dfdaac094" name="jde-to-sf-app-sub-flow" />
+		<os:store doc:name="Store current job run details"
+			doc:id="7f98734c-00b4-4ce2-adb5-1d247b3dff6c" key="previousJobRun" objectStore="Object_store_Previous_Job_Run">
+			<os:value><![CDATA[#[vars.jobRun]]]></os:value>
+		</os:store>
+	</flow>
+	<sub-flow name="jde-to-sf-app-sub-flow" doc:id="bdca494a-f953-4135-bf4a-da2e2d264754" >
+		<ee:transform doc:name="format-sql query" doc:id="41832f94-b4d6-45d5-b8fb-669625e1ff55" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output text/plain
+---
+readUrl("classpath://queryScript/sqlScript-$(p('mule.env')).dwl","text/plain")]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<ee:dynamic-evaluate doc:name="Dynamic Evaluate" doc:id="2518958f-d1aa-4cc3-b75a-4256322bd809" expression="#[payload]">
+		</ee:dynamic-evaluate>
+		<db:select doc:name="fetch-data-from-database" doc:id="cf8331cf-f8eb-41c8-ae03-64b793e1ad7c" config-ref="Oracle_JDE_Database_Config">
+			<reconnect />
+			<db:sql ><![CDATA[#[payload]]]></db:sql>
+		</db:select>
+		<logger level="INFO" doc:name="Logger" doc:id="10519f79-0de8-4d7e-b727-693f9dee8953" />
+		<choice doc:name="rounting-based-on-payload-fetched-from-db" doc:id="8c067b99-f588-47c4-9cda-af2bc32f92c9" tracking:enable-default-events="true">
+			<when expression="#[sizeOf(payload) &gt;0]">
+				<ee:transform doc:name="capture db payload" doc:id="5d961419-8838-4906-a87b-822aa5b48ca6">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json deferred = true
+---
+payload]]></ee:set-payload>
+			</ee:message>
+			<ee:variables>
+				<ee:set-variable variableName="emptyArray"><![CDATA[%dw 2.0
+output application/json
+---
+[]]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+				<foreach doc:name="For Each" doc:id="a2f42c96-4f82-4fdc-8334-7e4f19aa5488" collection="#[payload]" batchSize="${batch.size}">
+			<ee:transform doc:name="db-data-transformation" doc:id="48d224aa-b862-4e26-af14-4c0c87c80ca2">
+			<ee:message>
+							<ee:set-payload resource="dwl/finalMappingPayload.dwl" />
+			</ee:message>
+		</ee:transform>
+			<ee:transform doc:name="transform-to-sf-format" doc:id="3b14e576-5058-4417-b4ea-3f573755212e">
+			<ee:message>
+							<ee:set-payload resource="dwl/transformToSFFormat.dwl" />
+			</ee:message>
+		</ee:transform>
+			<logger level="INFO" doc:name="Message before upserting" doc:id="0adf630e-0253-4c42-a0a9-89876cedd700" message="#[payload]" category="${log.category}"/>
+					<salesforce:upsert doc:name="uspert-accounts-to-sf" doc:id="1cdf4ffe-86a1-437e-9b50-c4424f7ee789" objectType="${salesforce.object}" externalIdFieldName="${salesforce.externalId}" target="upsertResponse" config-ref="Salesforce_Config">
+						<reconnect-forever />
+					</salesforce:upsert>
+			<logger level="INFO" doc:name="Logger" doc:id="c4db2fcf-68ff-43f2-8930-f2d95911c979" message="Accounts Upsert to Salesforce Completed Successfully" category="${log.category}"/>
+		</foreach>
+			</when>
+			<otherwise >
+				<logger level="INFO" doc:name="Logger" doc:id="2b7e59a3-934c-4484-b7da-6aaea7610e5a" message="No data fetched in the current run" category="${log.category}"/>
+				<logger level="INFO" doc:name="Logger" doc:id="f554ee9c-5464-4569-8492-1af16c673941" message="No Accounts to Process in this Run Cycle" category="${log.category}"/>
+			</otherwise>
+		</choice>
+	</sub-flow>
+</mule>
