@@ -1,5 +1,5 @@
 %dw 2.0
-output application/java 
+output application/json 
 ---
 payload map (record) -> {
  "X1st_Address_Number__c": record.X1st_Address_Number__c default "" ,

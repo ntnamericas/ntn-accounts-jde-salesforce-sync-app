@@ -1,19 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:secure-properties="http://www.mulesoft.org/schema/mule/secure-properties"
+<mule xmlns:batch="http://www.mulesoft.org/schema/mule/batch"
+	xmlns:secure-properties="http://www.mulesoft.org/schema/mule/secure-properties"
 	xmlns:tracking="http://www.mulesoft.org/schema/mule/ee/tracking"
 	xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
 	xmlns:os="http://www.mulesoft.org/schema/mule/os"
 	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
-	xmlns:db="http://www.mulesoft.org/schema/mule/db"
-	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+	xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
 http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
 http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd
 http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
 http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking-ee.xsd
-http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/schema/mule/secure-properties/current/mule-secure-properties.xsd">
+http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/schema/mule/secure-properties/current/mule-secure-properties.xsd
+http://www.mulesoft.org/schema/mule/batch http://www.mulesoft.org/schema/mule/batch/current/mule-batch.xsd">
 	<flow name="jde-to-sf-flow"
 		doc:id="6bd6fd27-e7b2-48b6-9128-7a289f8a1160" tracking:enable-default-events="true">
 		<scheduler doc:name="Scheduler" doc:id="ec6d4725-fd5c-475e-865e-cbf70c9be8b0" >
@@ -57,15 +58,12 @@ readUrl("classpath://queryScript/sqlScript-$(p('mule.env')).dwl","text/plain")]]
 			<reconnect />
 			<db:sql ><![CDATA[#[payload]]]></db:sql>
 		</db:select>
-		<logger level="INFO" doc:name="Logger" doc:id="10519f79-0de8-4d7e-b727-693f9dee8953" />
+		<logger level="INFO" doc:name="Logger" doc:id="10519f79-0de8-4d7e-b727-693f9dee8953" message="Size of Payload from DB :  #[sizeOf(payload)]" category="${log.category}"/>
 		<choice doc:name="rounting-based-on-payload-fetched-from-db" doc:id="8c067b99-f588-47c4-9cda-af2bc32f92c9" tracking:enable-default-events="true">
 			<when expression="#[sizeOf(payload) &gt;0]">
 				<ee:transform doc:name="capture db payload" doc:id="5d961419-8838-4906-a87b-822aa5b48ca6">
 			<ee:message>
-				<ee:set-payload><![CDATA[%dw 2.0
-output application/json deferred = true
----
-payload]]></ee:set-payload>
+						<ee:set-payload resource="dwl/capture-payload.dwl" />
 			</ee:message>
 			<ee:variables>
 				<ee:set-variable variableName="emptyArray"><![CDATA[%dw 2.0
@@ -74,23 +72,38 @@ output application/json
 []]]></ee:set-variable>
 			</ee:variables>
 		</ee:transform>
-				<foreach doc:name="For Each" doc:id="a2f42c96-4f82-4fdc-8334-7e4f19aa5488" collection="#[payload]" batchSize="${batch.size}">
-			<ee:transform doc:name="db-data-transformation" doc:id="48d224aa-b862-4e26-af14-4c0c87c80ca2">
-			<ee:message>
-							<ee:set-payload resource="dwl/finalMappingPayload.dwl" />
-			</ee:message>
-		</ee:transform>
-			<ee:transform doc:name="transform-to-sf-format" doc:id="3b14e576-5058-4417-b4ea-3f573755212e">
+				<ee:transform doc:name="initialTransform Message" doc:id="55005501-7b98-4e97-a493-9e61c63efb82">
+								<ee:message>
+						<ee:set-payload resource="dwl/initial-transform.dwl" />
+								</ee:message>
+							</ee:transform>
+				<ee:transform doc:name="transform-to-sf-format" doc:id="3b14e576-5058-4417-b4ea-3f573755212e">
 			<ee:message>
 							<ee:set-payload resource="dwl/transformToSFFormat.dwl" />
 			</ee:message>
 		</ee:transform>
-			<logger level="INFO" doc:name="Message before upserting" doc:id="0adf630e-0253-4c42-a0a9-89876cedd700" message="#[payload]" category="${log.category}"/>
-					<salesforce:upsert doc:name="uspert-accounts-to-sf" doc:id="1cdf4ffe-86a1-437e-9b50-c4424f7ee789" objectType="${salesforce.object}" externalIdFieldName="${salesforce.externalId}" target="upsertResponse" config-ref="Salesforce_Config">
+				<batch:job jobName="jde-sf-accounts-batch-job" doc:id="5656b6a3-ece4-4f83-882d-22994803c5dc" blockSize="${batch.size}">
+					<batch:process-records >
+						<batch:step name="Batch_Step" doc:id="5edf2672-e03a-4ef1-84b3-a65e3801e8d9" >
+							<logger level="DEBUG" doc:name="Message before upserting" doc:id="0adf630e-0253-4c42-a0a9-89876cedd700" message="Batch Processing Started" category="${log.category}" />
+							<batch:aggregator doc:name="Batch Aggregator" doc:id="4202e880-ebe7-4843-a8a1-0ce9fb357be8" size="100">
+								<ee:transform doc:name="Transform Message" doc:id="596f9e3a-cb32-4211-a259-740045ab2881" >
+									<ee:message >
+										<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload map read( $, 'application/json')]]></ee:set-payload>
+									</ee:message>
+								</ee:transform>
+								<logger level="INFO" doc:name="Logger" doc:id="7a65180b-b1bb-4e42-ae37-d018cef7af4c" message='Composite Payload Before Accounts Upsert [ Max 100 Accounts per upsert] :   #[payload]' category="${log.category}"/>
+								<salesforce:upsert doc:name="upsert-accounts-to-sf" doc:id="1cdf4ffe-86a1-437e-9b50-c4424f7ee789" objectType="${salesforce.object}" externalIdFieldName="${salesforce.externalId}" config-ref="Salesforce_Config">
 						<reconnect-forever />
 					</salesforce:upsert>
-			<logger level="INFO" doc:name="Logger" doc:id="c4db2fcf-68ff-43f2-8930-f2d95911c979" message="Accounts Upsert to Salesforce Completed Successfully" category="${log.category}"/>
-		</foreach>
+								<logger level="INFO" doc:name="Logger" doc:id="d945109c-2a6e-4724-a464-cb7d3a05712c" message="#[%dw 2.0&#10;output application/json&#10;---&#10;payload]" category="${log.category}"/>
+							</batch:aggregator>
+						</batch:step>
+					</batch:process-records>
+				</batch:job>
 			</when>
 			<otherwise >
 				<logger level="INFO" doc:name="Logger" doc:id="2b7e59a3-934c-4484-b7da-6aaea7610e5a" message="No data fetched in the current run" category="${log.category}"/>
