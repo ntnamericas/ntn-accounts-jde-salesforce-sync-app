@@ -4,6 +4,9 @@ import * from dw::core::Strings
 // Function to extract the year from the date
 fun year(date) =
   (date as DateTime).year
+  
+fun C_value(date) =
+  floor((year(date) - 1900) / 100)
 
 // Function to extract the day of the year from the date
 fun dayOfYear(date) =
@@ -25,7 +28,7 @@ fun extractTime(date) =
 fun JulianDate(date) =
   {
     // Julian date calculation: full year + day of year padded to 3 digits
-    date: (year(date) as String) ++ leftPad(dayOfYear(date) as String, 3, "0"),
+    date: C_value(date) ++(year(date) as String)[2 to 3] ++ leftPad(dayOfYear(date), 3, "0"),
     
     // Julian time calculation: extract and format time
     time: extractTime(date)

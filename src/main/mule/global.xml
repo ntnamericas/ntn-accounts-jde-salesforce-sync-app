@@ -40,7 +40,7 @@ http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/sc
 		<salesforce:basic-connection
 			username="${secure::sf.user}" password="${secure::sf.password}"
 			securityToken="${secure::sf.token}"
-			url="https://ntnconnect--muledev.sandbox.my.salesforce.com/services/Soap/u/58.0" >
+			url="${sf.authURL}" >
 			<reconnection failsDeployment="true" >
 				<reconnect-forever />
 			</reconnection>

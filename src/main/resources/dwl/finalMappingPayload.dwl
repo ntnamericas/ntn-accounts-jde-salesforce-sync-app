@@ -119,9 +119,9 @@ payload map (item, index) -> (do {
       "Website": trim(item.WEBSITEEAEMAL),
       "BillingAddress": {
         "BillingStreet": trim([
-          trim(item.BILLINGADDRESSALADD1) ++ " \n ",
-          trim(item.BILLINGADDRESSALADD2) ++ " \n ",
-          trim(item.BILLINGADDRESSALADD3) ++ " \n ",
+          trim(item.BILLINGADDRESSALADD1) ++ " \n " default "",
+          trim(item.BILLINGADDRESSALADD2) ++ " \n " default "",
+          trim(item.BILLINGADDRESSALADD3) ++ " \n " default "",
           trim(item.BILLINGADDRESSALADD4)
         ] filter (!isEmpty($)) joinBy ""),
         "BillingCity": trim(item.BILLINGADDRESSALCTY1),
@@ -131,9 +131,9 @@ payload map (item, index) -> (do {
       },
       "ShippingAddress": {
         "ShippingStreet": trim([
-          trim(item.SHIPPINGADDRESSALADD1)  ++ " \n ",
-          trim(item.SHIPPINGADDRESSALADD2) ++ " \n ",
-          trim(item.SHIPPINGADDRESSALADD3) ++ " \n ",
+          trim(item.SHIPPINGADDRESSALADD1)  ++ " \n " default "",
+          trim(item.SHIPPINGADDRESSALADD2) ++ " \n " default "",
+          trim(item.SHIPPINGADDRESSALADD3) ++ " \n " default "",
           trim(item.SHIPPINGADDRESSALADD4)
         ] filter (!isEmpty($)) joinBy ""),
         "ShippingCity": trim(item.SHIPPINGADDRESSALCTY1),
