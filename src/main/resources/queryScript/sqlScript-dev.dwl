@@ -181,11 +181,12 @@ CurrencyIsoCode AS (
 ),
 -- Subquery for vars.F03012table
 F03012table AS (
-    select f2.ABAN8,f3.AIASN,f3.AIBADT,f3.AIACL,f3.AICMGR,f3.AICPGP,f3.AIDAOJ,f3.AIDLC,f3.AIARPY,f3.AIHOLD,f3.AITRAR,f3.AIINMG,f3.AITSTA,f3.AIAC06,f3.AIAC05,f3.AIDB, f3.AIUPMJ, f3.AIUPMT 
+    select f2.ABAN8,f3.AIAN8,f3.AIASN,f3.AIBADT,f3.AIACL,f3.AICMGR,f3.AICPGP,f3.AIDAOJ,f3.AIDLC,f3.AIARPY,f3.AIHOLD,f3.AITRAR,f3.AIINMG,f3.AITSTA,f3.AIAC06,f3.AIAC05,f3.AIDB, f3.AIUPMJ, f3.AIUPMT 
 	FROM testdta.F0101 f2
 	LEFT OUTER JOIN testdta.F03012 f3
-	ON trim(f2.ABAN8) = trim(f3.AIASN) 
-	WHERE trim(f3.AIASN)  in (select f1.ABAN8 from testdta.F0101 f1 where f1.ABUPMJ >= $(vars.jobRun.date) and f1.ABUPMT >= $(vars.previousJobRun.time) AND trim(f1.ABAT1) IN ('C','EU','EUX','CX','N') AND TRIM(f1.ABSIC) = 'NBCC') and (f2.ABUPMJ >= $(vars.jobRun.date) and f2.ABUPMT >= $(vars.previousJobRun.time)) and (f3.AIUPMJ >= $(vars.jobRun.date) AND f3.AIUPMT >= $(vars.previousJobRun.time))
+	ON trim(f2.ABAN8) = trim(f3.AIAN8) 
+	WHERE trim(f3.AIAN8)  in (select f1.ABAN8 from testdta.F0101 f1 where trim(f1.ABAT1) IN ('C','EU','EUX','CX','N') AND TRIM(f1.ABSIC) = 'NBCC')
+	--f1.ABUPMJ >= $(vars.jobRun.date) and f1.ABUPMT >= $(vars.previousJobRun.time) AND  and (f2.ABUPMJ >= $(vars.jobRun.date) and f2.ABUPMT >= $(vars.previousJobRun.time)) and (f3.AIUPMJ >= $(vars.jobRun.date) AND f3.AIUPMT >= $(vars.previousJobRun.time))
 
 ),
 
@@ -404,7 +405,7 @@ LEFT JOIN Region t9 ON trim(t1.ABAC02) = trim(t9.DRKY)
 LEFT JOIN RepCode t10 ON trim(t1.ABAC04) = trim(t10.DRKY)
 LEFT JOIN SicDesc t11 ON trim(t1.ABSIC) = trim(t11.DRKY)
 LEFT JOIN MailingName t12 ON trim(t1.ABAN8) = trim(t12.WWAN8)
-LEFT JOIN F03012table t27 ON trim(t1.ABAN8) = trim(t27.AIASN)
+LEFT JOIN F03012table t27 ON trim(t1.ABAN8) = trim(t27.AIAN8)
 LEFT JOIN accountEngineer t13 ON TRIM(t13.CUAC36) = trim(t27.AIAC06)
 LEFT JOIN accountMarketingRep t14 ON TRIM(t14.CUAC32) = trim(t27.AIAC05)
 LEFT JOIN MKTREP t15 ON  TRIM(t15.DRKY) = trim(t27.AIAC05)

@@ -13,7 +13,7 @@ payload map (record) -> {
  "Bill_To_Number__c": record.Bill_To_Number__c default "",
  "Customer_Service_Coordinator_Code__c": record.Customer_Service_Coordinator_Code__c default "",
  "Duns_Number__c": record.DunsNumber default "",
- "Effective_Date__c": if (record.Effective_Date__c == 0) "" else record.Effective_Date__c  as Date ,
+ //"Effective_Date__c": if (record.Effective_Date__c == 0) "" else record.Effective_Date__c  as Date ,
  "NumberOfEmployees": record.NumberOfEmployees default "",
  "Growth_Rate__c": record.Growth_Rate__c default "" ,
  "JDE_AddressNumber__c": record.JDE_AddressNumber__c default "",
@@ -44,7 +44,7 @@ payload map (record) -> {
  "Credit_Limit__c": record.Credit_Limit__c default "",
  "Credit_Manager__c": record.Credit_Manager__c default "",
  "Customer_Price_Group_40PC__c": record.Customer_Price_Group_40PC__c default "",
- "Date_Account_Opened__c": record.Date_Account_Opened__c as Date default "",
+ //"Date_Account_Opened__c": record.Date_Account_Opened__c as Date default "",
  "Date_Of_Last_Credit_Review__c": record.Date_Of_Last_Credit_Review__c as Date default "",
  "Dun_Bradstreet_Rating__c": record.Dun_Bradstreet_Rating__c default "",
  "Factor_Special_Payee__c": record.Factor_Special_Payee__c default "",
@@ -72,7 +72,5 @@ payload map (record) -> {
  "BillingCity":  record.BillingAddress.BillingCity default "" ,
  "BillingStateCode": record.BillingAddress.BillingStateCode default "" ,
  "BillingPostalCode" : record.BillingAddress.BillingPostalCode default "" ,
- "BillingCountryCode" : record.BillingAddress.BillingCountryCode default "" ,
- "Date_Account_Opened__c": record.Date_Account_Opened__c as Date  default "",
- "Date_Of_Last_Credit_Review__c": record.Date_Of_Last_Credit_Review__c as Date default ""
+ "BillingCountryCode" : record.BillingAddress.BillingCountryCode default ""
 }

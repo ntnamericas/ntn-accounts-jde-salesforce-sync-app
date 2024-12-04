@@ -29,13 +29,13 @@ http://www.mulesoft.org/schema/mule/batch http://www.mulesoft.org/schema/mule/ba
 				<ee:set-variable resource="dwl/vars-jobRun.dwl" variableName="jobRun" />
 			</ee:variables>
 		</ee:transform>
-		<logger level="INFO" doc:name="jobRun logger" doc:id="54482bd7-6269-4bea-b2a1-f8b4ecc28bcf" message="#[vars.jobRun]" category="${log.category}"/>
+		<logger level="INFO" doc:name="jobRun logger" doc:id="54482bd7-6269-4bea-b2a1-f8b4ecc28bcf" message="#[vars.jobRun]"/>
 		<os:retrieve doc:name="retrievePreviousJobRun"
 			doc:id="58f9cd3c-67fc-46af-8e45-f31831aa8bb5" key="previousJobRun"
 			target="previousJobRun" objectStore="Object_store_Previous_Job_Run">
 			<os:default-value><![CDATA[#[vars.jobRun]]]></os:default-value>
 		</os:retrieve>
-		<logger level="INFO" doc:name="Logger" doc:id="642c7f5b-d720-4986-a517-914ebb74cef4" message='Calling "jde-to-sf-app-sub-flow"' category="${log.category}"/>
+		<logger level="INFO" doc:name="Logger" doc:id="642c7f5b-d720-4986-a517-914ebb74cef4" message='Calling "jde-to-sf-app-sub-flow"'/>
 		<flow-ref doc:name="jde-to-sf-app-sub-flow"
 			doc:id="b264356f-83ed-4901-946c-e20dfdaac094" name="jde-to-sf-app-sub-flow" />
 		<os:store doc:name="Store current job run details"
@@ -58,7 +58,7 @@ readUrl("classpath://queryScript/sqlScript-$(p('mule.env')).dwl","text/plain")]]
 			<reconnect />
 			<db:sql ><![CDATA[#[payload]]]></db:sql>
 		</db:select>
-		<logger level="INFO" doc:name="Logger" doc:id="10519f79-0de8-4d7e-b727-693f9dee8953" message="Size of Payload from DB :  #[sizeOf(payload)]" category="${log.category}"/>
+		<logger level="INFO" doc:name="Logger" doc:id="10519f79-0de8-4d7e-b727-693f9dee8953" message="Size of Payload from DB :  #[sizeOf(payload)]"/>
 		<choice doc:name="rounting-based-on-payload-fetched-from-db" doc:id="8c067b99-f588-47c4-9cda-af2bc32f92c9" tracking:enable-default-events="true">
 			<when expression="#[sizeOf(payload) &gt;0]">
 				<ee:transform doc:name="capture db payload" doc:id="5d961419-8838-4906-a87b-822aa5b48ca6">
@@ -84,8 +84,8 @@ output application/json
 		</ee:transform>
 				<batch:job jobName="jde-sf-accounts-batch-job" doc:id="5656b6a3-ece4-4f83-882d-22994803c5dc" blockSize="${batch.size}">
 					<batch:process-records >
-						<batch:step name="Batch_Step" doc:id="5edf2672-e03a-4ef1-84b3-a65e3801e8d9" >
-							<logger level="DEBUG" doc:name="Message before upserting" doc:id="0adf630e-0253-4c42-a0a9-89876cedd700" message="Batch Processing Started" category="${log.category}" />
+						<batch:step name="jde-sf-accounts-batch-step" doc:id="5edf2672-e03a-4ef1-84b3-a65e3801e8d9" >
+							<logger level="INFO" doc:name="Message before upserting" doc:id="0adf630e-0253-4c42-a0a9-89876cedd700" message="Batch Processing Started"/>
 							<batch:aggregator doc:name="Batch Aggregator" doc:id="4202e880-ebe7-4843-a8a1-0ce9fb357be8" size="100">
 								<ee:transform doc:name="Transform Message" doc:id="596f9e3a-cb32-4211-a259-740045ab2881" >
 									<ee:message >
@@ -95,7 +95,7 @@ output application/json
 payload map read( $, 'application/json')]]></ee:set-payload>
 									</ee:message>
 								</ee:transform>
-								<logger level="INFO" doc:name="Logger" doc:id="7a65180b-b1bb-4e42-ae37-d018cef7af4c" message='Composite Payload Before Accounts Upsert [ Max 100 Accounts per upsert] :   #[payload]' category="${log.category}"/>
+								<logger level="INFO" doc:name="Logger" doc:id="7a65180b-b1bb-4e42-ae37-d018cef7af4c" message='Composite Payload Before Accounts Upsert [ Max 100 Accounts per upsert] :   #[payload]'/>
 								<salesforce:upsert doc:name="upsert-accounts-to-sf" doc:id="1cdf4ffe-86a1-437e-9b50-c4424f7ee789" objectType="${salesforce.object}" externalIdFieldName="${salesforce.externalId}" config-ref="Salesforce_Config">
 						<reconnect-forever />
 					</salesforce:upsert>
