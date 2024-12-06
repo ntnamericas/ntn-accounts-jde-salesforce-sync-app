@@ -104,25 +104,25 @@ billAccount AS (
 billFax AS (
     SELECT f0.WPAR1, f0.WPPH1, f0.WPPHTP, f0.WPAN8, f0.WPUPMT, f0.WPUPMJ 
     FROM CRPDTA.F0115 f0
-    WHERE  trim(f0.WPPHTP) = 'FAX' and (f0.WPUPMJ >= $(vars.jobRun.date) AND f0.WPUPMT >= $(vars.previousJobRun.time))
+    WHERE  trim(f0.WPPHTP) = 'FAX' and (f0.WPUPMJ >= 124338 AND f0.WPUPMT >= 143358)
 ),
 -- Subquery for vars.billPhone
 billPhone AS (
     SELECT f0.WPAR1, f0.WPPH1, f0.WPPHTP, f0.WPAN8, f0.WPUPMT, f0.WPUPMJ
     FROM CRPDTA.F0115 f0
-    WHERE trim(f0.WPPHTP) = 'BLANK' and (f0.WPUPMJ >= $(vars.jobRun.date) AND f0.WPUPMT >= $(vars.previousJobRun.time))
+    WHERE trim(f0.WPPHTP) = 'BLANK' and (f0.WPUPMJ >= 124338 AND f0.WPUPMT >= 143358)
 ),
 -- Subquery for vars.billFaxABAN8
 billFaxABAN8 AS (
     SELECT f0.WPAR1, f0.WPPH1, f0.WPPHTP, f0.WPAN8, f0.WPUPMT, f0.WPUPMJ
     FROM CRPDTA.F0115 f0
-    WHERE trim(f0.WPPHTP) = 'BLANK' and (f0.WPUPMJ >= $(vars.jobRun.date) AND f0.WPUPMT >= $(vars.previousJobRun.time))
+    WHERE trim(f0.WPPHTP) = 'BLANK' and (f0.WPUPMJ >= 124338 AND f0.WPUPMT >= 143358)
 ),
 -- Subquery for vars.phone
 phone AS (
     SELECT f0.WPAR1, f0.WPPH1, f0.WPAN8, f0.WPUPMT, f0.WPUPMJ
     FROM CRPDTA.F0115 f0
-    WHERE trim(f0.WPPHTP) = 'BLANK' and (f0.WPUPMJ >= $(vars.jobRun.date) AND f0.WPUPMT >= $(vars.previousJobRun.time))
+    WHERE trim(f0.WPPHTP) = 'BLANK' and (f0.WPUPMJ >= 124338 AND f0.WPUPMT >= 143358)
 ),
 -- Subquery for vars.Website
 Website AS (
@@ -147,7 +147,7 @@ Website AS (
 billingAddress AS (
 	SELECT AL1.ALAN8, AL1.ALEFTB, AL1.ALADD1, AL1.ALADD2, AL1.ALADD3, AL1.ALADD4, AL1.ALCTY1, AL1.ALADDS, AL1.ALADDZ, AL1.ALCTR, AL1.ALUPMJ, AL1.ALUPMT
 	FROM CRPDTA.F0116 AL1
-	WHERE AL1.ALAN8 in (select f1.ABAN81 from CRPDTA.F0101 f1 where f1.ABUPMJ >= $(vars.jobRun.date) and f1.ABUPMT >= $(vars.previousJobRun.time) AND f1.ABAT1 IN ('C','EU','EUX','CX','N') AND TRIM(f1.ABSIC) = 'NBCC') and (AL1.ALUPMJ >= $(vars.jobRun.date) AND AL1.ALUPMT >= $(vars.previousJobRun.time))
+	WHERE AL1.ALAN8 IN (select f1.ABAN81 from CRPDTA.F0101 f1 where f1.ABAT1 IN ('C','EU','EUX','CX','N') AND TRIM(f1.ABSIC) = 'NBCC') 
 ),
 -- Subquery for vars.billingCountryCode
 billingCountryCode AS (
@@ -165,7 +165,8 @@ shippingCountryCode AS (
 ShippingAddress AS (
 	SELECT AL1.*
 	FROM CRPDTA.F0116 AL1
-	WHERE AL1.ALAN8 in (select f1.ABAN8 from CRPDTA.F0101 f1 where f1.ABUPMJ >= $(vars.jobRun.date) and f1.ABUPMT >= $(vars.previousJobRun.time) AND f1.ABAT1 IN ('C','EU','EUX','CX','N') AND TRIM(f1.ABSIC) = 'NBCC') and (AL1.ALUPMJ >= $(vars.jobRun.date) AND AL1.ALUPMT >= $(vars.previousJobRun.time))
+	WHERE AL1.ALAN8 IN ( select f1.ABAN8 from CRPDTA.F0101 f1 where f1.ABAT1 IN ('C','EU','EUX','CX','N') AND TRIM(f1.ABSIC) = 'NBCC') 
+	
 ),
 -- Subquery for vars.Parent
 Parent AS (
@@ -177,7 +178,8 @@ Parent AS (
 CurrencyIsoCode AS (
 	SELECT f3.AICRCD,f3.AIAN8
 	FROM CRPDTA.F03012 f3
-	WHERE f3.AIAN8 in (select f1.ABAN8 from CRPDTA.F0101 f1 where f1.ABUPMJ >= $(vars.jobRun.date) and f1.ABUPMT >= $(vars.previousJobRun.time) AND f1.ABAT1 IN ('C','EU','EUX','CX','N') AND TRIM(f1.ABSIC) = 'NBCC') and (f3.AIUPMJ >= $(vars.jobRun.date) AND f3.AIUPMT >= $(vars.previousJobRun.time))
+	WHERE f3.AIAN8 IN (select f1.ABAN8 from CRPDTA.F0101 f1 where f1.ABAT1 IN ('C','EU','EUX','CX','N') AND TRIM(f1.ABSIC) = 'NBCC')
+	--f1.ABUPMJ >= 124338 and f1.ABUPMT >= 143358  and (f3.AIUPMJ >= 124338 AND f3.AIUPMT >= 143358)
 ),
 -- Subquery for vars.F03012table
 F03012table AS (
@@ -185,13 +187,10 @@ F03012table AS (
 	FROM CRPDTA.F0101 f2
 	LEFT OUTER JOIN CRPDTA.F03012 f3
 	ON trim(f2.ABAN8) = trim(f3.AIAN8) 
-	WHERE trim(f3.AIAN8)  in (select f1.ABAN8 from CRPDTA.F0101 f1 where trim(f1.ABAT1) IN ('C','EU','EUX','CX','N') AND TRIM(f1.ABSIC) = 'NBCC')
-	--f1.ABUPMJ >= $(vars.jobRun.date) and f1.ABUPMT >= $(vars.previousJobRun.time) AND  and (f2.ABUPMJ >= $(vars.jobRun.date) and f2.ABUPMT >= $(vars.previousJobRun.time)) and (f3.AIUPMJ >= $(vars.jobRun.date) AND f3.AIUPMT >= $(vars.previousJobRun.time))
+	WHERE trim(f3.AIAN8)  IN (select f1.ABAN8 from CRPDTA.F0101 f1 where trim(f1.ABAT1) IN ('C','EU','EUX','CX','N') AND TRIM(f1.ABSIC) = 'NBCC')
+	 --f1.ABUPMJ >= 124338 and f1.ABUPMT >= 143358 AND trim(f1.ABAT1) IN ('C','EU','EUX','CX','N') AND TRIM(f1.ABSIC) = 'NBCC') and (f2.ABUPMJ >= 124338 and f2.ABUPMT >= 143358) and (f3.AIUPMJ >= 124338 AND f3.AIUPMT >= 143358)
 
 ),
-
-
-
 -- Subquery for vars.billingAddressType
 billingAddressType AS (
 	select DRDL01,DRKY
@@ -243,7 +242,7 @@ temporaryCreditMessage AS (
 branchCode AS (
     select AXEXRA, AXAN8
     from CRPDTA.F4780
-    where AXAN8 in (select f1.ABAN8 from CRPDTA.F0101 f1 where f1.ABUPMJ >= $(vars.jobRun.date) and f1.ABUPMT >= $(vars.previousJobRun.time) AND f1.ABAT1 IN ('C','EU','EUX','CX','N') AND TRIM(f1.ABSIC) = 'NBCC')
+    where AXAN8 in (select f1.ABAN8 from CRPDTA.F0101 f1 where f1.ABUPMJ >= 124338 and f1.ABUPMT >= 143358 AND f1.ABAT1 IN ('C','EU','EUX','CX','N') AND TRIM(f1.ABSIC) = 'NBCC')
 ),
 
 -- Subquery for vars.Owner
@@ -264,10 +263,6 @@ Engineer AS (
     from CRPCTL.F0005
     where trim(DRSY) = '01' AND trim(DRRT) = '06'
 )
-
-
-
-
 -- Add more subqueries as needed
 SELECT 
     t1.*, 
@@ -435,4 +430,5 @@ LEFT JOIN Owner t37 ON trim(t1.ABAC04) = trim(t37.CUAC04)
 LEFT JOIN accountCoordinator t38 ON trim(t1.ABAC05) = trim(t38.CUAC06)
 LEFT JOIN Engineer t39 ON trim(t27.AIAC06) = trim(t39.DRKY)
 LEFT JOIN NTNADVPRCGRP t41 ON trim(t27.AIASN) = trim(t41.DRKY)
-where ((t1.ABUPMJ >= $(vars.jobRun.date) and t1.ABUPMT >= $(vars.previousJobRun.time)) OR (t27.AIUPMJ >= $(vars.jobRun.date) AND t27.AIUPMT >= $(vars.previousJobRun.time)) OR (t22.ALUPMJ >= $(vars.jobRun.date) AND t22.ALUPMT >= $(vars.previousJobRun.time)) OR (t24.ALUPMJ >= $(vars.jobRun.date)AND t24.ALUPMT >= $(vars.previousJobRun.time)) OR (t17.WPUPMJ >= $(vars.jobRun.date) AND t17.WPUPMT >= $(vars.previousJobRun.time)) OR (t18.WPUPMJ >= $(vars.jobRun.date)AND t18.WPUPMT >= $(vars.previousJobRun.time)) OR (t19.WPUPMJ >= $(vars.jobRun.date) AND t19.WPUPMT >= $(vars.previousJobRun.time)) OR (t20.WPUPMJ >= $(vars.jobRun.date) AND t20.WPUPMT >= $(vars.previousJobRun.time))) AND t1.ABAT1 IN ('C','EU','EUX','CX','N') AND TRIM(t1.ABSIC) = 'NBCC'"
+where ((t1.ABUPMJ >= $(vars.jobRun.date) and t1.ABUPMT >= $(vars.previousJobRun.time)) OR (t27.AIUPMJ >= $(vars.jobRun.date) AND t27.AIUPMT >= $(vars.previousJobRun.time)) OR (t22.ALUPMJ >= $(vars.jobRun.date) AND t22.ALUPMT >= $(vars.previousJobRun.time)) OR (t24.ALUPMJ >= $(vars.jobRun.date) AND t24.ALUPMT >= $(vars.previousJobRun.time)) OR (t17.WPUPMJ >= $(vars.jobRun.date) AND t17.WPUPMT >= $(vars.previousJobRun.time)) OR (t18.WPUPMJ >= $(vars.jobRun.date) AND t18.WPUPMT >= $(vars.previousJobRun.time)) OR (t19.WPUPMJ >= $(vars.jobRun.date) AND t19.WPUPMT >= $(vars.previousJobRun.time)) OR (t20.WPUPMJ >= $(vars.jobRun.date) AND t20.WPUPMT >= $(vars.previousJobRun.time))) AND t1.ABAT1 IN ('C','EU','EUX','CX','N') AND TRIM(t1.ABSIC) = 'NBCC'
+--where t1.ABAN8='29191'"

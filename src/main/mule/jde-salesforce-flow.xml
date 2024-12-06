@@ -82,7 +82,7 @@ output application/json
 							<ee:set-payload resource="dwl/transformToSFFormat.dwl" />
 			</ee:message>
 		</ee:transform>
-				<batch:job jobName="jde-sf-accounts-batch-job" doc:id="5656b6a3-ece4-4f83-882d-22994803c5dc" blockSize="${batch.size}">
+				<batch:job jobName="jde-sf-accounts-batch-job" doc:id="5656b6a3-ece4-4f83-882d-22994803c5dc" blockSize="${batch.size}" maxFailedRecords="-1">
 					<batch:process-records >
 						<batch:step name="jde-sf-accounts-batch-step" doc:id="5edf2672-e03a-4ef1-84b3-a65e3801e8d9" >
 							<logger level="INFO" doc:name="Message before upserting" doc:id="0adf630e-0253-4c42-a0a9-89876cedd700" message="Batch Processing Started"/>
