@@ -79,6 +79,7 @@ payload map (item, index) -> (do {
     ---
     {
       "X1st_Address_Number__c": item.ABAN81,
+      "X2nd_Address_Number__c": item.ABAN82,  
       "X2nd_Address_Number__c": item.ABAN82,
       "X3rd_Party_Billing__c": item.ABAN83,
       "Name": trim(item.ABALPH),

@@ -1,0 +1,14 @@
+db:
+  password: "![ij6UP3XXjZM=]"
+  user: "![c6/KkkNKJ/o=]"
+  
+sf:
+  token: "![1O3V3uqG9wtByGHznFQhsc1Q4BYp3HsPQbnzOU3Ieso=]"
+  password: "![hRt1ri9KnH5UalfO4hI4Vg==]"
+  user: "![7D6dQ58N548Rz1uJgVDECAGaYc/54LwS993X5US4CZY=]"
+  
+salesforce:
+  consumerSecret: "![/R6rU6BCBm6HSsMJWPKTSd97S0VwGuQdqnnCRpYHdgJfJ7hb/Va5860uD6lVzmQ/95UtFnynjLulyE8DlNQGAyDIjV/aQhK2]"
+  tokenUrl: "![m67Li978SJvXmcejyk2dQFiDSi07dfdmQWnz6+TdBoG5Yum2MdVwhLq9g4HmFLfDeOSUthv3HSDCU3UpW3LNpw==]"
+  password: "![hRt1ri9KnH5UalfO4hI4Vg==]"
+  securityToken: "![JhgrtzUlJd6gpyeuTzym4JupsjX9hy2qCe3TPoeFO7Y=]"

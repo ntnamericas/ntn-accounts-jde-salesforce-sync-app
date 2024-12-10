@@ -18,13 +18,13 @@ http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/cu
 http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
 http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking-ee.xsd
 http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/schema/mule/secure-properties/current/mule-secure-properties.xsd">
-	<db:config name="Oracle_JDE_Database_Config" doc:name="Database Config"
+	<db:config name="Oracle_JDE_Database_Config"
+		doc:name="Database Config"
 		doc:id="06bf993d-5e0b-4c46-9243-e3fa0cbb2bb5">
 		<db:oracle-connection host="${db.host}"
 			user="${secure::db.user}" password="${secure::db.password}"
-			serviceName="${db.svc}"
-			port="${db.port}" >
-			<reconnection failsDeployment="true" >
+			serviceName="${db.svc}" port="${db.port}">
+			<reconnection failsDeployment="true">
 				<reconnect-forever />
 			</reconnection>
 		</db:oracle-connection>
@@ -33,19 +33,15 @@ http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/sc
 		doc:name="Object store" doc:id="145bd695-0942-4780-b224-684dc576a1b0"
 		entryTtl="3" entryTtlUnit="DAYS" expirationIntervalUnit="DAYS"
 		config-ref="ObjectStore_Config" />
-		
+
 	<salesforce:sfdc-config name="Salesforce_Config"
 		doc:name="Salesforce Config"
 		doc:id="619a21aa-3d47-4511-b2fc-5e5d12a18264">
-		<salesforce:basic-connection
-			username="${secure::sf.user}" password="${secure::sf.password}"
-			securityToken="${secure::sf.token}"
-			url="${sf.authURL}" >
-			<reconnection failsDeployment="true" >
-				<reconnect-forever />
-			</reconnection>
-		</salesforce:basic-connection>
-	</salesforce:sfdc-config>
+		<salesforce:oauth-user-pass-connection
+			consumerKey="${salesforce.consumerKey}" consumerSecret="${secure::salesforce.consumerSecret}" username="${salesforce.userName}" securityToken="${secure::salesforce.securityToken}"
+			password="${secure::salesforce.password}" tokenEndpoint="${secure::salesforce.tokenUrl}"/>
+	
+</salesforce:sfdc-config>
 	<os:config name="ObjectStore_Config"
 		doc:name="ObjectStore Config"
 		doc:id="5991a747-dc85-4554-bb70-46a57f185a9b">
@@ -63,12 +59,13 @@ http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/sc
 		<secure-properties:encrypt
 			algorithm="Blowfish" />
 	</secure-properties:config>
-	<!-- <global-property doc:name="Global Property"
-		doc:id="7f18326f-42a8-44b8-90c4-171c89e991d0" name="encrypt.key"
-		value="secure12345" /> -->
+	<!-- <global-property doc:name="Global Property" doc:id="7f18326f-42a8-44b8-90c4-171c89e991d0" 
+		name="encrypt.key" value="secure12345" /> -->
 	<configuration-properties
 		doc:name="Configuration properties"
 		doc:id="8432741f-fc28-46c0-bc69-c612fba9f0aa"
 		file="properties/common.yaml" />
-	<global-property doc:name="Global Property" doc:id="3ee61aa3-577a-4ca9-b056-db0909e0315b" name="encrypt.key" value="replaceme" />
+	<global-property doc:name="Global Property"
+		doc:id="3ee61aa3-577a-4ca9-b056-db0909e0315b" name="encrypt.key"
+		value="replaceme" />
 </mule>
