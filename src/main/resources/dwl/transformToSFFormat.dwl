@@ -13,7 +13,7 @@ payload map (record) -> {
  "Bill_To_Number__c": record.Bill_To_Number__c default "",
  "Customer_Service_Coordinator_Code__c": record.Customer_Service_Coordinator_Code__c default "",
  "Duns_Number__c": record.DunsNumber default "",
- "Effective_Date__c": if (record.Effective_Date__c == 0) "" else record.Effective_Date__c  as Date ,
+ //"Effective_Date__c": if (record.Effective_Date__c == 0) "" else record.Effective_Date__c  as Date ,
  "NumberOfEmployees": record.NumberOfEmployees default "",
  "Growth_Rate__c": record.Growth_Rate__c default "" ,
  "JDE_AddressNumber__c": record.JDE_AddressNumber__c default "",

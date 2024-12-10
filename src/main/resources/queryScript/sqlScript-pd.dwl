@@ -12,7 +12,7 @@ DRDL01_ST AS (
 coordinatorCode AS (
     SELECT DRKY, DRDL01 
     FROM CRPCTL.F0005 
-    WHERE trim(DRSY) = '01' AND trim(DRRT) = '06' 
+    WHERE trim(DRSY) = '01' AND trim(DRRT) = '05' 
 ),
 -- Subquery for vars.NBCAMarket
 NBCAMarket AS (
@@ -104,50 +104,49 @@ billAccount AS (
 billFax AS (
     SELECT f0.WPAR1, f0.WPPH1, f0.WPPHTP, f0.WPAN8, f0.WPUPMT, f0.WPUPMJ 
     FROM CRPDTA.F0115 f0
-    WHERE  trim(f0.WPPHTP) = 'FAX' and (f0.WPUPMJ >= 124338 AND f0.WPUPMT >= 143358)
+    WHERE  trim(f0.WPPHTP) = 'FAX' and f0.WPIDLN = 0 --and (f0.WPUPMJ >= 124338 AND f0.WPUPMT >= 143358)
 ),
 -- Subquery for vars.billPhone
 billPhone AS (
     SELECT f0.WPAR1, f0.WPPH1, f0.WPPHTP, f0.WPAN8, f0.WPUPMT, f0.WPUPMJ
     FROM CRPDTA.F0115 f0
-    WHERE trim(f0.WPPHTP) = 'BLANK' and (f0.WPUPMJ >= 124338 AND f0.WPUPMT >= 143358)
+    WHERE (f0.WPPHTP) = ' ' and f0.WPIDLN = 0 and f0.WPRCK7 = 1 --and (f0.WPUPMJ >= 124338 AND f0.WPUPMT >= 143358)
 ),
 -- Subquery for vars.billFaxABAN8
 billFaxABAN8 AS (
     SELECT f0.WPAR1, f0.WPPH1, f0.WPPHTP, f0.WPAN8, f0.WPUPMT, f0.WPUPMJ
     FROM CRPDTA.F0115 f0
-    WHERE trim(f0.WPPHTP) = 'BLANK' and (f0.WPUPMJ >= 124338 AND f0.WPUPMT >= 143358)
+    WHERE trim(f0.WPPHTP) = 'FAX' and f0.WPIDLN = 0 --and (f0.WPUPMJ >= 124338 AND f0.WPUPMT >= 143358)
 ),
 -- Subquery for vars.phone
 phone AS (
     SELECT f0.WPAR1, f0.WPPH1, f0.WPAN8, f0.WPUPMT, f0.WPUPMJ
     FROM CRPDTA.F0115 f0
-    WHERE trim(f0.WPPHTP) = 'BLANK' and (f0.WPUPMJ >= 124338 AND f0.WPUPMT >= 143358)
+    WHERE (f0.WPPHTP) = ' ' and f0.WPIDLN = 0 and f0.WPRCK7 = 1 --and (f0.WPUPMJ >= 124338 AND f0.WPUPMT >= 143358)
 ),
 -- Subquery for vars.Website
 Website AS (
     SELECT EA.EAEMAL, EA.EAAN8, WW.WWAN8
 	FROM CRPDTA.F01151 EA
 	JOIN CRPDTA.F0111 WW ON EA.EAAN8 = WW.WWAN8
-	WHERE WW.WWIDLN = '0'
-	  AND EA.EAIDLN = '0'
+	WHERE WW.WWIDLN = 0
+	  AND EA.EAIDLN = 0
 	  AND EA.EAETP = 'I'
 ),
--- Subquery for vars.Website
---Website AS (
---    SELECT EA.EAEMAL, EA.EAAN8
---	FROM CRPDTA.F01151 EA
---	JOIN CRPDTA.F0111 WW ON EA.EAAN8 = WW.WWAN8
---	WHERE WW.WWAN8 IN ('')
---	  AND WW.WWIDLN = '0'
---	  AND EA.EAIDLN = '0'
---	  AND EA.EAETP = 'I'
---),
+-- Subquery for vars.Email
+Email AS (
+    SELECT EA.EAEMAL, EA.EAAN8, WW.WWAN8
+	FROM CRPDTA.F01151 EA
+	JOIN CRPDTA.F0111 WW ON EA.EAAN8 = WW.WWAN8
+	WHERE WW.WWIDLN = 0
+	  AND EA.EAIDLN = 0
+	  AND EA.EAETP = 'E'
+  ),
 -- Subquery for vars.billingAddress
 billingAddress AS (
 	SELECT AL1.ALAN8, AL1.ALEFTB, AL1.ALADD1, AL1.ALADD2, AL1.ALADD3, AL1.ALADD4, AL1.ALCTY1, AL1.ALADDS, AL1.ALADDZ, AL1.ALCTR, AL1.ALUPMJ, AL1.ALUPMT
 	FROM CRPDTA.F0116 AL1
-	WHERE AL1.ALAN8 IN (select f1.ABAN81 from CRPDTA.F0101 f1 where  f1.ABAT1 IN ('C','EU','EUX','CX','N') AND TRIM(f1.ABSIC) = 'NBCC')
+	WHERE AL1.ALAN8 IN (select f1.ABAN81 from CRPDTA.F0101 f1 where  f1.ABAT1 IN ('C','EU','EUX','CX','N') AND TRIM(f1.ABSIC) = 'NBCC') AND AL1.aleftb = (select max(w.aleftb) from crpdta.f0116 w where w.alan8 = AL1.alan8)
 ),
 -- Subquery for vars.billingCountryCode
 billingCountryCode AS (
@@ -165,7 +164,7 @@ shippingCountryCode AS (
 ShippingAddress AS (
 	SELECT AL1.*
 	FROM CRPDTA.F0116 AL1
-	WHERE AL1.ALAN8 IN ( select f1.ABAN8 from CRPDTA.F0101 f1 where f1.ABAT1 IN ('C','EU','EUX','CX','N') AND TRIM(f1.ABSIC) = 'NBCC') 
+	WHERE AL1.ALAN8 IN ( select f1.ABAN8 from CRPDTA.F0101 f1 where f1.ABAT1 IN ('C','EU','EUX','CX','N') AND TRIM(f1.ABSIC) = 'NBCC') AND AL1.aleftb = (select max(w.aleftb) from crpdta.f0116 w where w.alan8 = AL1.alan8)
 	
 ),
 -- Subquery for vars.Parent
@@ -242,7 +241,8 @@ temporaryCreditMessage AS (
 branchCode AS (
     select AXEXRA, AXAN8
     from CRPDTA.F4780
-    where AXAN8 in (select f1.ABAN8 from CRPDTA.F0101 f1 where f1.ABUPMJ >= 124338 and f1.ABUPMT >= 143358 AND f1.ABAT1 IN ('C','EU','EUX','CX','N') AND TRIM(f1.ABSIC) = 'NBCC')
+    where AXAN8 in (select f1.ABAN8 from CRPDTA.F0101 f1 where f1.ABAT1 IN ('C','EU','EUX','CX','N') AND TRIM(f1.ABSIC) = 'NBCC')
+    ---AND f1.ABUPMJ >= 124338 and f1.ABUPMT >= 143358
 ),
 
 -- Subquery for vars.Owner
@@ -386,7 +386,9 @@ SELECT
 	END AS shippingCountryCodeValue,
 	t40.DRKY AS shippingCountryCodeDRKY,
     t41.DRDL01 AS NTNADVPRCGRPDRDL01,
-    t41.DRKY AS NTNADVPRCGRPDRKY
+    t41.DRKY AS NTNADVPRCGRPDRKY,
+    t42.EAEMAL AS EmailEAEMAL,
+	t42.EAAN8 AS EmailEAAN8
 FROM 
     CRPDTA.F0101 t1
 LEFT JOIN DRDL01_ST t2 ON trim(t1.ABAT1) = trim(t2.DRKY)
@@ -407,9 +409,10 @@ LEFT JOIN MKTREP t15 ON  TRIM(t15.DRKY) = trim(t27.AIAC05)
 LEFT JOIN billAccount t16 ON trim(t1.ABAN81) = trim(t16.AXAN8)
 LEFT JOIN billFax t17 ON trim(t1.ABAN81) = trim(t17.WPAN8)
 LEFT JOIN billPhone t18 ON trim(t1.ABAN81) = trim(t18.WPAN8)
-LEFT JOIN billFaxABAN8 t19 ON  trim(t1.ABAN8) = trim(t19.WPAN8)
+LEFT JOIN billFaxABAN8 t19 ON  trim(t1.ABAN81) = trim(t19.WPAN8)
 LEFT JOIN phone t20 ON trim(t1.ABAN8) = trim(t20.WPAN8)
 LEFT JOIN Website t21 ON trim(t1.ABAN8) = trim(t21.EAAN8) and trim(t1.ABAN8) = trim(t21.WWAN8)
+LEFT JOIN Email t42 ON trim(t1.ABAN8) = trim(t42.EAAN8) and trim(t1.ABAN8) = trim(t42.WWAN8)
 LEFT JOIN billingAddress t22 ON trim(t1.ABAN81) = trim(t22.ALAN8)
 LEFT JOIN billingCountryCode t23 ON trim(t22.ALCTR) = trim(t23.DRKY)
 LEFT JOIN ShippingAddress t24 ON trim(t1.ABAN8) = trim(t24.ALAN8)
@@ -431,4 +434,4 @@ LEFT JOIN accountCoordinator t38 ON trim(t1.ABAC05) = trim(t38.CUAC06)
 LEFT JOIN Engineer t39 ON trim(t27.AIAC06) = trim(t39.DRKY)
 LEFT JOIN NTNADVPRCGRP t41 ON trim(t27.AIASN) = trim(t41.DRKY)
 where ((t1.ABUPMJ >= $(vars.jobRun.date) and t1.ABUPMT >= $(vars.previousJobRun.time)) OR (t27.AIUPMJ >= $(vars.jobRun.date) AND t27.AIUPMT >= $(vars.previousJobRun.time)) OR (t22.ALUPMJ >= $(vars.jobRun.date) AND t22.ALUPMT >= $(vars.previousJobRun.time)) OR (t24.ALUPMJ >= $(vars.jobRun.date) AND t24.ALUPMT >= $(vars.previousJobRun.time)) OR (t17.WPUPMJ >= $(vars.jobRun.date) AND t17.WPUPMT >= $(vars.previousJobRun.time)) OR (t18.WPUPMJ >= $(vars.jobRun.date) AND t18.WPUPMT >= $(vars.previousJobRun.time)) OR (t19.WPUPMJ >= $(vars.jobRun.date) AND t19.WPUPMT >= $(vars.previousJobRun.time)) OR (t20.WPUPMJ >= $(vars.jobRun.date) AND t20.WPUPMT >= $(vars.previousJobRun.time))) AND t1.ABAT1 IN ('C','EU','EUX','CX','N') AND TRIM(t1.ABSIC) = 'NBCC'
---where t1.ABAN8='29191'"
+--where t1.ABAN8='30059'"
