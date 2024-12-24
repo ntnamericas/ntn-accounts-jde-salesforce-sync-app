@@ -37,4 +37,4 @@ fun JulianDate(date) =
 // Main output as JSON
 output application/json  
 ---
-JulianDate(now() as DateTime >> "EST")
+JulianDate((now()- |P10D| ) as DateTime >> "EST")

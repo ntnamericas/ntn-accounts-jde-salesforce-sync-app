@@ -93,9 +93,9 @@ output application/json
 								<ee:transform doc:name="Transform Message" doc:id="596f9e3a-cb32-4211-a259-740045ab2881" >
 									<ee:message >
 										<ee:set-payload ><![CDATA[%dw 2.0
-output application/json
+output application/java
 ---
-payload map read( $, 'application/json')]]></ee:set-payload>
+payload ]]></ee:set-payload>
 									</ee:message>
 								</ee:transform>
 								<logger level="INFO" doc:name="Logger" doc:id="7a65180b-b1bb-4e42-ae37-d018cef7af4c" message='Composite Payload Before Accounts Upsert [ Max 100 Accounts per upsert] :   #[payload]'/>

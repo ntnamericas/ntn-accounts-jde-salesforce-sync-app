@@ -1,7 +1,7 @@
-%dw 2.0
-	import * from dw::core::Strings
+	%dw 2.0
+	import * from dw::core::Strings 
 	output application/json
- 
+
 	// Function to convert Julian date to standard date format
 	fun julianToStandard(julianDate : Number) = do {
 		var myDate = if (sizeOf(julianDate splitBy '') > 5) {
@@ -31,10 +31,10 @@
 	  else
 		((("0101" ++ myDate.year) as Date {format: "ddMMyyyy"}) + ("P$(myDate.day - 1)D" as Period)) as Date {format: "yyyy-MM-dd"}
 	}
- 
+
 	fun concatKeyValue(DRKY, DRDL01, pvalue) =
 	  (if (!isEmpty(DRKY))
-	  [trim(DRKY),trim(DRDL01)] filter (!isEmpty($)) joinBy "-"
+	  [trim(DRKY),trim(DRDL01)] filter (!isEmpty($)) joinBy  "-"
 	  else
 		pvalue)
 	---
@@ -79,7 +79,7 @@
 		---
 		{
 		  "X1st_Address_Number__c": (( item.ABAN81 as Number ) + 90000000),
-		  "X2nd_Address_Number__c": ((item.ABAN82 as Number )+ 90000000) ,
+		  "X2nd_Address_Number__c": ((item.ABAN82 as Number )+ 90000000) ,  
 		  "X3rd_Party_Billing__c": ((item.ABAN83 as Number) + 90000000),
 		  "Name": trim(item.ABALPH),
 		  "AccountNumber": ((item.ABAN8 as Number) + 90000000),
@@ -113,7 +113,7 @@
 		  "Mailing_Name__c": trim(item.MAILINGNAME),
 		  "Bill_To_Fax__c": if(!isEmpty(item.BILLFAXWPAR1) and !isEmpty(item.BILLFAXWPPH1))["(", trim(item.BILLFAXWPAR1), ")", " ", trim(item.BILLFAXWPPH1)] joinBy "" else "",
 		  "Bill_To_Phone__c":if(!isEmpty(item.BILLPHONEWPAR1) and !isEmpty(item.BILLPHONEWPPH1))["(", trim(item.BILLPHONEWPAR1), ")", " ", trim(item.BILLPHONEWPPH1)] joinBy "" else "",
- 
+
 		  "Fax": if(!isEmpty(item.BILLFAXABAN8WPAR1) and !isEmpty(item.BILLFAXABAN8WPPH1)) ["(", trim(item.BILLFAXABAN8WPAR1), ")", " ", trim(item.BILLFAXABAN8WPPH1)] joinBy "" else "",
 		  "Phone": if(!isEmpty(item.PHONEWPAR1) and !isEmpty(item.PHONEWPPH1)) ["(", trim(item.PHONEWPAR1), ")", " ", trim(item.PHONEWPPH1)] joinBy "" else "",
 		  "Website": trim(item.WEBSITEEAEMAL),
@@ -144,12 +144,12 @@
 		  ("Parent": trim(item.PARENTAXDC)) if (!isEmpty(item.PARENTAXDC)),
 		  "Parent_Number__c": ((trim(item.ABAN86) as Number) + 90000000),
 		  "CurrencyIsoCode": item.CURRENCYISOCODEAICRCD,
-		  "Billing_Address_Type__c":
+		  "Billing_Address_Type__c": 
 			if (!isEmpty(item.BILLINGADDRESSTYPEDRDL01) and !isEmpty(item.BILLINGADDRESSTYPEDRKY))
 			  trim(item.BILLINGADDRESSTYPEDRKY) default "" ++ "-" ++ trim(item.BILLINGADDRESSTYPEDRDL01) default ""
 			else
 			  "",
-		  "Credit_Limit__c":
+		  "Credit_Limit__c": 
 			if (!isEmpty(item.F03012TABLEAIACL))
 			  trim(item.F03012TABLEAIACL)
 			else
@@ -167,7 +167,7 @@
 			else
 			  "",
 		  "Dun_Bradstreet_Rating__c": concatKeyValue(item.DUNBRADSTREETDRKY, item.DUNBRADSTREETDRDL01, trim(item.F03012TABLEAIDB)),
-		  "Factor_Special_Payee__c":
+		  "Factor_Special_Payee__c": 
 			if (!isEmpty(item.F03012TABLEAIARPY))
 			  trim(item.F03012TABLEAIARPY)
 			else
@@ -185,7 +185,7 @@
 		  "Account_Engineer__c": trim(item.accountEngineer),
 		  "Account_Marketing_Rep__c": trim(item.ACCOUNTMARKETINGREP),
 		  "MKT_REP__c": concatKeyValue(item.MKTREPDRKY, item.MKTREPDRDL01, trim(item.F03012TABLEAIAC05)),
-		  "NTN_Company_Number__c":
+		  "NTN_Company_Number__c": 
 			if (trim(item.ABSIC) ~= "NBCC")
 			  "00010"
 			else
