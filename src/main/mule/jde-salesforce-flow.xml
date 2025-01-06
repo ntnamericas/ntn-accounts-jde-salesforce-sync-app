@@ -102,7 +102,7 @@ payload ]]></ee:set-payload>
 								<salesforce:upsert doc:name="upsert-accounts-to-sf" doc:id="1cdf4ffe-86a1-437e-9b50-c4424f7ee789" objectType="${salesforce.object}" externalIdFieldName="${salesforce.externalId}" config-ref="Salesforce_Config">
 						<reconnect-forever />
 					</salesforce:upsert>
-								<logger level="INFO" doc:name="Logger" doc:id="d945109c-2a6e-4724-a464-cb7d3a05712c" message="#[%dw 2.0&#10;output application/json&#10;---&#10;if (payload.successful == true) {Successful : payload.successful}&#10;else (payload.items map() -&gt; {&#10;	failedId: $.id,&#10;	message: $.message&#10;	&#10;})]" category="${log.category}"/>
+								<logger level="INFO" doc:name="Logger" doc:id="d945109c-2a6e-4724-a464-cb7d3a05712c" message="#[%dw 2.0&#10;output application/json&#10;---&#10;{&#10;    successful: payload.items filter $.successful == true map {&#10;        id: $.id,&#10;        payload: $.payload&#10;    },&#10;    unsuccessful: payload.items filter $.successful == false map {&#10;        id: $.id,&#10;        errorMessage: $.message,&#10;        errorDetails: $.payload.errors map {&#10;            message: $.message,&#10;            statusCode: $.statusCode&#10;        }&#10;    }&#10;}]" category="${log.category}"/>
 							</batch:aggregator>
 						</batch:step>
 					</batch:process-records>
