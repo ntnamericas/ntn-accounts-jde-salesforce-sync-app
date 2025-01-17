@@ -1,12 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:http="http://www.mulesoft.org/schema/mule/http"
+<mule xmlns:file="http://www.mulesoft.org/schema/mule/file"
+	xmlns:dw="http://www.mulesoft.org/schema/mule/ee/dw"
+	xmlns:email="http://www.mulesoft.org/schema/mule/email"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
 	xmlns:batch="http://www.mulesoft.org/schema/mule/batch"
 	xmlns:secure-properties="http://www.mulesoft.org/schema/mule/secure-properties"
 	xmlns:tracking="http://www.mulesoft.org/schema/mule/ee/tracking"
 	xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
-	xmlns:os="http://www.mulesoft.org/schema/mule/os"
-	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+	xmlns:os="http://www.mulesoft.org/schema/mule/os" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd 
+http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee/dw/current/dw.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
 http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
@@ -14,7 +18,8 @@ http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/cu
 http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
 http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking-ee.xsd
 http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/schema/mule/secure-properties/current/mule-secure-properties.xsd
-http://www.mulesoft.org/schema/mule/batch http://www.mulesoft.org/schema/mule/batch/current/mule-batch.xsd">
+http://www.mulesoft.org/schema/mule/batch http://www.mulesoft.org/schema/mule/batch/current/mule-batch.xsd
+http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/email/current/mule-email.xsd">
 	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="333bf380-33a1-4564-85c3-ac95e4161d2b" >
 		<http:listener-connection host="0.0.0.0" port="8081" />
 	</http:listener-config>
@@ -85,44 +90,225 @@ output application/json
 							<ee:set-payload resource="dwl/transformToSFFormat.dwl" />
 			</ee:message>
 		</ee:transform>
-				<!-- [STUDIO:"Logger"]<logger level="INFO" doc:name="Logger" doc:id="f8756f2c-d14c-459a-903a-ea23ae3c8c47" message="#[payload&#93;"/> [STUDIO] -->
-				<batch:job jobName="jde-sf-accounts-batch-job" doc:id="5656b6a3-ece4-4f83-882d-22994803c5dc" blockSize="${batch.size}" maxFailedRecords="-1">
+				<logger level="INFO" doc:name="Logger" doc:id="f8756f2c-d14c-459a-903a-ea23ae3c8c47" message="#[payload]"/>
+				<batch:job jobName="jde-sf-accounts-batch-job" doc:id="deb5e095-21fa-4718-a971-7575161ecbc7" blockSize="${batch.size}" maxFailedRecords="-1">
+					<batch:process-records>
+						<batch:step name="jde-sf-accounts-batch-step" doc:id="df703d92-a454-4529-bfbb-c7112aead900">
+							<logger level="INFO" doc:name="Message before upserting" doc:id="292bbbb1-065b-4738-8849-c68d8366cee1" message="Batch Processing Started" />
+							<batch:aggregator doc:name="Batch Aggregator" doc:id="83238bbf-257e-4800-88eb-19b4eea85374" size="100">
+								<choice doc:name="Choice" doc:id="a5555369-afbc-4cf2-b7d7-3051c45c18e7">
+									<when expression="#[payload != {}]">
+										<ee:transform doc:name="Transform Message" doc:id="4927c249-c77e-42f8-ac69-a0e3988cca50">
+									<ee:message>
+										<ee:set-payload><![CDATA[%dw 2.0
+output application/csv header=true
+---
+(payload map ((item) -> 
+    if (item is Binary) 
+        read(item as String {encoding: "UTF-8"}, "application/json") 
+    else if (item is String)
+        read(item, "application/json") 
+    else if (item is Object) 
+        item 
+    else 
+        {error: "Unsupported type", item: item}
+)) 
+filter ((item) -> 
+    item != null and item != {}
+) 
+map ((item) -> 
+    {
+        Error: (item.error[0] default "") as String,
+        ID: (item.id[0] default "") as String,
+        Data: 
+            "---\n" ++ 
+            (write(item.data[0] default {}, "application/json", {indent: true})) 
+            // Pretty-print JSON data for readability
+    }
+)
+]]></ee:set-payload>
+									</ee:message>
+								</ee:transform>
+
+    <!-- Save CSV to a File -->
+
+    <!-- Send Email -->								
+										<email:send doc:name="Send" doc:id="1487d3f2-a2b3-4bd0-9f0b-6a9a6061ec79" fromAddress="${secure::smtp.user}" subject="Error Payload for Accounts" toAddresses="#[p('smtp.to') splitBy &quot;,&quot;]" config-ref="Email_SMTP1">
+									<email:body contentType="text/plain" encoding="UTF-8">
+										<email:content><![CDATA[#["Hi Team, 
+Please find error and IDs attached."]]]></email:content>
+									</email:body>
+									<email:attachments><![CDATA[#[{ 'ErrorPayload.csv': payload }]]]></email:attachments>
+								</email:send>
+									</when>
+									<otherwise>
+										<logger level="INFO" doc:name="Logger" doc:id="bff5efae-6a5d-44a2-9baf-cb78e7403a80" message="Composite Error Payload " />
+									</otherwise>
+								</choice>
+							</batch:aggregator>
+							<logger level="INFO" doc:name="Logger" doc:id="240e959e-5c86-451c-9b36-1d03c0d5ce5f" message="#[payload]" />
+							<ee:transform doc:name="Transform Message" doc:id="3c56da5d-3778-421c-9fee-b2826f227a4f">
+								<ee:message>
+								</ee:message>
+								<ee:variables>
+									<ee:set-variable variableName="sfData"><![CDATA[%dw 2.0
+output application/json
+---
+[payload]]]></ee:set-variable>
+								</ee:variables>
+							</ee:transform>
+							<salesforce:upsert doc:name="upsert-accounts-to-sf" doc:id="08a8ab27-1746-47f5-b662-8d31ee6a66d9" objectType="${salesforce.object}" externalIdFieldName="${salesforce.externalId}" config-ref="Salesforce_Config">
+						<reconnect-forever />
+						<salesforce:records><![CDATA[#[[payload]]]]></salesforce:records>
+					</salesforce:upsert>
+							<ee:transform doc:name="Transform Message" doc:id="e159fffa-439a-4f4f-9bab-bd5e5d3e4713">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+    successful: payload.items filter $.successful == true map {
+        id: $.id,
+        payload: $.payload
+    },
+    unsuccessful: payload.items filter $.successful == false map {
+        id: $.id,
+        errorMessage: $.message,
+        errorDetails: $.payload.errors map {
+            message: $.message,
+            statusCode: $.statusCode,
+            Error : $.payload
+        }
+    }
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+							<choice doc:name="Choice" doc:id="db2aea8f-a3b3-427d-b37f-89e92ca5d9f5">
+								<when expression="#[(payload.unsuccessful !=[]) and (payload.successful == [])]">
+							<ee:transform doc:name="Transform Message" doc:id="7182cb61-3fa4-4b3e-a67c-c4673a015e05">
+										<ee:message>
+											<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"data" : vars.sfData ,
+    "error": payload.unsuccessful.errorMessage,
+    "id": payload.unsuccessful.id
+}
+ ]]></ee:set-payload>
+										</ee:message>
+										<ee:variables>
+										</ee:variables>
+									</ee:transform>
+							<async doc:name="Async" doc:id="a2201b17-4e56-40b2-81be-b8572380b1ae">
+								<logger level="INFO" doc:name="Logger" doc:id="38d7a558-d9f0-491e-bb33-699f4a3b8f8a" message="#[payload]" />
+							</async>
+								</when>
+								<otherwise>
+							<logger level="INFO" doc:name="Logger" doc:id="a73ec4e1-12f7-4290-82ef-ab3b89339872" message="#[payload]" />
+							<ee:transform doc:name="Transform Message" doc:id="4c2a8e44-4e10-4037-a0d1-5af14863e723">
+								<ee:message>
+									<ee:set-payload><![CDATA[{}]]></ee:set-payload>
+								</ee:message>
+							</ee:transform>
+								</otherwise>
+							</choice>
+						</batch:step>
+					</batch:process-records>
+				</batch:job>
+				<!-- [STUDIO:"jde-sf-accounts-batch-job"]<batch:job jobName="jde-sf-accounts-batch-job" doc:id="5656b6a3-ece4-4f83-882d-22994803c5dc" blockSize="${batch.size}" maxFailedRecords="-1">
 					<batch:process-records >
 						<batch:step name="jde-sf-accounts-batch-step" doc:id="5edf2672-e03a-4ef1-84b3-a65e3801e8d9" >
 							<logger level="INFO" doc:name="Message before upserting" doc:id="0adf630e-0253-4c42-a0a9-89876cedd700" message="Batch Processing Started"/>
-							<logger level="INFO" doc:name="Logger" doc:id="2131b472-bc8e-425e-a8f7-620237fbbe13" message="#[payload]"/>
-							<salesforce:upsert doc:name="upsert-accounts-to-sf" doc:id="1cdf4ffe-86a1-437e-9b50-c4424f7ee789" objectType="${salesforce.object}" externalIdFieldName="${salesforce.externalId}" config-ref="Salesforce_Config">
-						<reconnect-forever />
-								<salesforce:records ><![CDATA[#[[payload]]]]></salesforce:records>
-					</salesforce:upsert>
-							<logger level="INFO" doc:name="Logger" doc:id="d945109c-2a6e-4724-a464-cb7d3a05712c" message="#[%dw 2.0&#10;output application/json&#10;---&#10;{&#10;    successful: payload.items filter $.successful == true map {&#10;        id: $.id,&#10;        payload: $.payload&#10;    },&#10;    unsuccessful: payload.items filter $.successful == false map {&#10;        id: $.id,&#10;        errorMessage: $.message,&#10;        errorDetails: $.payload.errors map {&#10;            message: $.message,&#10;            statusCode: $.statusCode,&#10;            Error : $.payload&#10;        }&#10;    }&#10;}]" category="${log.category}" />
-							<!-- [STUDIO:"Batch Aggregator"]<batch:aggregator doc:name="Batch Aggregator" doc:id="4202e880-ebe7-4843-a8a1-0ce9fb357be8" size="100">
-								<ee:transform doc:name="Transform Message" doc:id="596f9e3a-cb32-4211-a259-740045ab2881" >
-									<ee:message >
-										<ee:set-payload ><![CDATA[%dw 2.0
+							<batch:aggregator doc:name="Batch Aggregator" doc:id="4202e880-ebe7-4843-a8a1-0ce9fb357be8" size="100">
+								<choice doc:name="Choice" doc:id="1c86188a-3a05-402e-8762-f03bb58519fb" >
+									<when expression="#[vars.factor == true&#93;">
+										<ee:transform doc:name="Transform Message" doc:id="596f9e3a-cb32-4211-a259-740045ab2881">
+									<ee:message>
+										<ee:set-payload><![CDATA[%dw 2.0
 output application/java
 &#45;&#45;-
 payload &#93;&#93;></ee:set-payload>
 									</ee:message>
 								</ee:transform>
-								<logger level="INFO" doc:name="Logger" doc:id="7a65180b-b1bb-4e42-ae37-d018cef7af4c" message='Composite Payload Before Accounts Upsert [ Max 100 Accounts per upsert&#93; :   #[payload&#93;'/>
-								<until-successful maxRetries="5" doc:name="Until Successful" doc:id="4572718f-2850-485e-9429-5071378330fa">
-									</until-successful>
-							</batch:aggregator> [STUDIO] -->
+										<logger level="INFO" doc:name="Logger" doc:id="7a65180b-b1bb-4e42-ae37-d018cef7af4c" message="Composite Error Payload After Accounts Upsert [ Max 100 Accounts per upsert&#93; :   #[payload&#93;" />
+									</when>
+									<otherwise >
+										<logger level="INFO" doc:name="Logger" doc:id="1708dd5d-ff9b-4acc-a61a-b089a9ce99be" message="Composite Error Payload "/>
+									</otherwise>
+								</choice>
+							</batch:aggregator>
+							<logger level="INFO" doc:name="Logger" doc:id="2131b472-bc8e-425e-a8f7-620237fbbe13" message="#[payload&#93;"/>
+							<ee:transform doc:name="Transform Message" doc:id="463a376b-9d6e-4dc8-b83e-005e47d341e6" >
+								<ee:message >
+								</ee:message>
+								<ee:variables >
+									<ee:set-variable variableName="sfData" ><![CDATA[%dw 2.0
+output application/json
+&#45;&#45;-
+[payload&#93;&#93;&#93;></ee:set-variable>
+								</ee:variables>
+							</ee:transform>
+							<salesforce:upsert doc:name="upsert-accounts-to-sf" doc:id="1cdf4ffe-86a1-437e-9b50-c4424f7ee789" objectType="${salesforce.object}" externalIdFieldName="${salesforce.externalId}" config-ref="Salesforce_Config">
+						<reconnect-forever />
+								<salesforce:records ><![CDATA[#[[payload&#93;&#93;&#93;&#93;></salesforce:records>
+					</salesforce:upsert>
+							<ee:transform doc:name="Transform Message" doc:id="33e605c9-dcc5-4a12-b9ef-d96cc6a10b6a" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+&#45;&#45;-
+{
+    successful: payload.items filter $.successful == true map {
+        id: $.id,
+        payload: $.payload
+    },
+    unsuccessful: payload.items filter $.successful == false map {
+        id: $.id,
+        errorMessage: $.message,
+        errorDetails: $.payload.errors map {
+            message: $.message,
+            statusCode: $.statusCode,
+            Error : $.payload
+        }
+    }
+}&#93;&#93;></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+							<choice doc:name="Choice" doc:id="efccbdad-a69c-468b-b092-706620dd3414" >
+								<when expression="#[(payload.unsuccessful !=[&#93;) and (payload.successful == [&#93;)&#93;">
+									<ee:transform doc:name="Transform Message" doc:id="407cb1b3-ff81-4d03-9865-20224d4b89e8" >
+										<ee:message >
+											<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+&#45;&#45;-
+vars.sfData ++ [payload&#93;&#93;&#93;></ee:set-payload>
+										</ee:message>
+										<ee:variables >
+											<ee:set-variable variableName="factor" ><![CDATA[(payload.unsuccessful !=[&#93;) and (payload.successful == [&#93;)&#93;&#93;></ee:set-variable>
+										</ee:variables>
+									</ee:transform>
+									<logger level="INFO" doc:name="Logger" doc:id="2ba27415-25f0-483e-9659-92d80ebe31df" message="#[payload&#93;"/>
+								</when>
+								<otherwise >
+									<logger level="INFO" doc:name="Logger" doc:id="266197b8-edd0-48d3-9550-3560f0d1aa63" message="#[payload&#93;"/>
+								</otherwise>
+							</choice>
+							<logger level="INFO" doc:name="Logger" doc:id="d945109c-2a6e-4724-a464-cb7d3a05712c" message="#[%dw 2.0&#10;output application/json&#10;&#45;&#45;-&#10;{&#10;    successful: payload.items filter $.successful == true map {&#10;        id: $.id,&#10;        payload: $.payload&#10;    },&#10;    unsuccessful: payload.items filter $.successful == false map {&#10;        id: $.id,&#10;        errorMessage: $.message,&#10;        errorDetails: $.payload.errors map {&#10;            message: $.message,&#10;            statusCode: $.statusCode,&#10;            Error : $.payload&#10;        }&#10;    }&#10;}&#93;" category="${log.category}" />
 						</batch:step>
 						<batch:step name="Batch_Step" doc:id="d0b024cc-3684-4a7f-8324-aaec9deff087" acceptPolicy="ONLY_FAILURES">
 							<ee:transform doc:name="Transform Message" doc:id="29864d24-1cc1-42bc-852d-d5b65a67e8f1" >
 								<ee:message >
 									<ee:set-payload ><![CDATA[%dw 2.0
 output application/json
----
-payload]]></ee:set-payload>
+&#45;&#45;-
+payload&#93;&#93;></ee:set-payload>
 								</ee:message>
 							</ee:transform>
-							<logger level="INFO" doc:name="Logger" doc:id="34b358ed-e66e-4a17-896f-1e58b55f9533" message="#[payload]"/>
+							<logger level="INFO" doc:name="Logger" doc:id="34b358ed-e66e-4a17-896f-1e58b55f9533" message="#[payload&#93;"/>
 						</batch:step>
 					</batch:process-records>
-				</batch:job>
+				</batch:job> [STUDIO] -->
 			</when>
 			<otherwise >
 				<logger level="INFO" doc:name="Logger" doc:id="2b7e59a3-934c-4484-b7da-6aaea7610e5a" message="No data fetched in the current run" category="${log.category}"/>
@@ -130,4 +316,18 @@ payload]]></ee:set-payload>
 			</otherwise>
 		</choice>
 	</sub-flow>
+	<!-- [STUDIO:"jde-salesforce-flowFlow"]<flow name="jde-salesforce-flowFlow" doc:id="21d14909-57b5-42cb-bf2c-0dac726dc963" >
+		<http:listener doc:name="Listener" doc:id="b6252b83-2411-4d45-9f50-373dcaf5fb1b" config-ref="HTTP_Listener_config" path="/local"/>
+		<logger level="INFO" doc:name="Logger" doc:id="28bf040b-368d-4f07-aa4a-a20f65d7649a" />
+		<ee:transform doc:name="Transform Message" doc:id="3b6bf861-4dd7-4e88-8cf3-80f3cc648ab3" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+&#45;&#45;-
+payload&#93;&#93;></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="5f0ef403-d2e1-4e1e-9c39-7a7f9c2a18e3" message="END of the flow"/>
+		
+	</flow> [STUDIO] -->
 </mule>

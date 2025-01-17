@@ -17,3 +17,10 @@ api.id: ""
 salesforce:
   userName: "ntnmule@prowesssoft.com.muledev"
   consumerKey: "3MVG9L6vUmMQkenO4eUEn5yWMHoerVYLl6GuerWyAZOrHXDwFS19L7AE7CuxfF.IqLkJb5WD5YC5FTLpEK9fD"
+  
+  
+  
+smtp:
+  host: "smtp.office365.com"
+  port: "25"  
+  to: "simran.modi@prowesssoft.com"  

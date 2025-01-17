@@ -12,3 +12,7 @@ salesforce:
   tokenUrl: "![m67Li978SJvXmcejyk2dQCaDoznBT98JHfuKM4pdZ3QWU72AD9AccnqOqxSsT7JlJnIG9IhcFznnbGdL41APekHbJbbH+QM7kZ3CfK1r0fU=]"
   password: "![hRt1ri9KnH5UalfO4hI4Vg==]"
   securityToken: "![1O3V3uqG9wtByGHznFQhsc1Q4BYp3HsPQbnzOU3Ieso=]"
+  
+smtp:
+  user: "![hRt1ri9KnH7VngaJcayGZ0D8arLBERHy1f3i+Ca4XPI=]"
+  password: "![Yk3HBzCPPp5RL3nOfWNzirX1mi98hVMs]"    
