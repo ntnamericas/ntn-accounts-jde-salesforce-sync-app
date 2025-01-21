@@ -39,7 +39,7 @@ payload map (record) -> {
  "Fax": record.Fax default "",
  "Phone": record.Phone default "",
  "Website": record.Website default "",
- "Parent_Number__c": record.Parent_Number__c default "",
+ "Parent_Number__c": if (record.JDE_AddressNumber__c == record.Parent_Number__c) "" else record.Parent_Number__c,
  "CurrencyIsoCode": record.CurrencyIsoCode default "",
  "Credit_Limit__c": record.Credit_Limit__c default "",
  "Credit_Manager__c": record.Credit_Manager__c default "",
