@@ -4,7 +4,7 @@
 
 	<groupId>com.ntn</groupId>
 	<artifactId>ntn-accounts-jde-salesforce-sync-app</artifactId>
-	<version>1.0.2-rc3</version>
+	<version>1.0.2-rc5</version>
 	<packaging>mule-application</packaging>
 
 	<name>ntn-accounts-jde-salesforce-sync-app</name>
@@ -82,6 +82,18 @@
 			<groupId>org.mule.connectors</groupId>
 			<artifactId>mule-http-connector</artifactId>
 			<version>1.9.1</version>
+			<classifier>mule-plugin</classifier>
+		</dependency>
+		<dependency>
+			<groupId>org.mule.connectors</groupId>
+			<artifactId>mule-email-connector</artifactId>
+			<version>1.7.3</version>
+			<classifier>mule-plugin</classifier>
+		</dependency>
+		<dependency>
+			<groupId>org.mule.connectors</groupId>
+			<artifactId>mule-file-connector</artifactId>
+			<version>1.5.1</version>
 			<classifier>mule-plugin</classifier>
 		</dependency>
 	</dependencies>
