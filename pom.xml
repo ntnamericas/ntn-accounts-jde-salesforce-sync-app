@@ -4,7 +4,7 @@
 
 	<groupId>com.ntn</groupId>
 	<artifactId>ntn-accounts-jde-salesforce-sync-app</artifactId>
-	<version>1.0.2-rc5</version>
+	<version>1.0.3-rc7</version>
 	<packaging>mule-application</packaging>
 
 	<name>ntn-accounts-jde-salesforce-sync-app</name>
@@ -13,8 +13,8 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-		<app.runtime>4.6.1</app.runtime>
-		<mule.maven.plugin.version>4.2.0</mule.maven.plugin.version>
+		<app.runtime>4.6.9</app.runtime>
+		<mule.maven.plugin.version>4.3.0</mule.maven.plugin.version>
 	</properties>
 
 	<build>
@@ -74,11 +74,6 @@
 			<classifier>mule-plugin</classifier>
 		</dependency>
 		<dependency>
-			<groupId>com.mycompany</groupId>
-			<artifactId>ojdbc8-12.2.0.1</artifactId>
-			<version>0.1</version>
-		</dependency>
-		<dependency>
 			<groupId>org.mule.connectors</groupId>
 			<artifactId>mule-http-connector</artifactId>
 			<version>1.9.1</version>
@@ -95,6 +90,11 @@
 			<artifactId>mule-file-connector</artifactId>
 			<version>1.5.1</version>
 			<classifier>mule-plugin</classifier>
+		</dependency>
+		<dependency>
+			<groupId>com.mycompany</groupId>
+			<artifactId>ojdbc8-12.2.0.1</artifactId>
+			<version>0.1</version>
 		</dependency>
 	</dependencies>
 

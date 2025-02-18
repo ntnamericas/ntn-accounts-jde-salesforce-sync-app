@@ -27,7 +27,7 @@ http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/sc
 			user="${secure::db.user}" password="${secure::db.password}"
 			serviceName="${db.svc}" port="${db.port}">
 			<reconnection failsDeployment="true">
-				<reconnect-forever />
+				<reconnect count="5" />
 			</reconnection>
 		</db:oracle-connection>
 	</db:config>
@@ -70,7 +70,7 @@ http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/sc
 	<global-property doc:name="Global Property"
 		doc:id="3ee61aa3-577a-4ca9-b056-db0909e0315b" name="encrypt.key"
 		value="replaceme" />
-	<email:smtp-config name="Email_SMTP1"
+	<email:smtp-config name="Email_SMTP"
 		doc:name="Email SMTP" doc:id="ab328f7c-f462-4868-a409-e6df5c18592d">
 		<email:smtp-connection host="${smtp.host}"
 			port="${smtp.port}" user="${secure::smtp.user}"
