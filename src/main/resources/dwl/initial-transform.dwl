@@ -133,8 +133,8 @@ var recordType = if (trim(item.SIC) ~= "NBCC" and trim(item.SEARCHTYPE) ~= "C")
 //WHEN (TRIM(TO_CHAR(ALCTR)) IS NULL OR TRIM(TO_CHAR(ALCTR)) = '') AND TRIM(TO_CHAR(ABSIC)) = 'NBCC'
 //THEN 'CA'	ELSE 'US'
       "BillingCountryCode": 
-  if (!isEmpty(trim(item.CTRBILL))) upper(substring(trim(item.CTRBILL), 0, 2)) 
-  else if (isEmpty(trim(item.CTRBILL)) and !isEmpty(item.SIC) and trim(item.SIC) == 'NBCC') 'CA' 
+  if (!isEmpty(trim(item.BILLCTR))) trim(item.BILLCTR) 
+  else if (isEmpty(trim(item.BILLCTR)) and !isEmpty(item.SIC) and trim(item.SIC) == 'NBCC') 'CA' 
     else 'US',
 		  },
 		  "ShippingAddress": {
@@ -152,8 +152,8 @@ var recordType = if (trim(item.SIC) ~= "NBCC" and trim(item.SEARCHTYPE) ~= "C")
 //WHEN (TRIM(TO_CHAR(ALCTR)) IS NULL OR TRIM(TO_CHAR(ALCTR)) = '') AND TRIM(TO_CHAR(ABSIC)) = 'NBCC'
 //THEN 'CA'	ELSE 'US'
       "ShippingCountryCode": 
-  if (!isEmpty(trim(item.CTRSHIP))) upper(substring(trim(item.CTRSHIP), 0, 2)) 
-  else if (isEmpty(trim(item.CTRSHIP)) and !isEmpty(item.SIC) and trim(item.SIC) == 'NBCC') 'CA' 
+  if (!isEmpty(trim(item.SHIPCTR))) trim(item.SHIPCTR)
+  else if (isEmpty(trim(item.SHIPCTR)) and !isEmpty(item.SIC) and trim(item.SIC) == 'NBCC') 'CA' 
     else 'US',
 		  },
 		  "Parent": trim(item.PARENTID),
