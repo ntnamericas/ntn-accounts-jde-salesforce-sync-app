@@ -39,7 +39,7 @@
 		pvalue)
 	---
 	payload map (item, index) -> (do {
-		var recordType = if (trim(item.ABSIC) ~= "NBCC" and trim(item.ABAT1) ~= "C")
+var recordType = if (trim(item.SIC) ~= "NBCC" and trim(item.SEARCHTYPE) ~= "C")
 		  {
 			"RecordTypeId": "012f4000000MFV5AAO",
 			"Is_Account_Activated__c": true,
@@ -48,7 +48,7 @@
 			"Address_Type__c": 'C-Customer',
 			"Integration_Complete__c": true
 		  }
-		else if (trim(item.ABSIC) ~= "NBCC" and trim(item.ABAT1) ~= "CX")
+		else if (trim(item.SIC) ~= "NBCC" and trim(item.SEARCHTYPE) ~= "CX")
 		  {
 			"RecordTypeId": "012f4000000MFV5AAO",
 			"Is_Account_Activated__c": false,
@@ -57,7 +57,7 @@
 			"Address_Type__c": 'CX-Inactive Customer',
 			"Integration_Complete__c": true
 		  }
-		else if (trim(item.ABSIC) ~= "NBCC" and trim(item.ABAT1) ~= "EU")
+		else if (trim(item.SIC) ~= "NBCC" and trim(item.SEARCHTYPE) ~= "EU")
 		  {
 			"RecordTypeId": "012f4000000d9wxAAA",
 			"Is_Account_Activated__c": true,
@@ -66,7 +66,7 @@
 			"Address_Type__c": 'EU-End User',
 			"Integration_Complete__c": true
 		  }
-		else if (trim(item.ABSIC) ~= "NBCC" and trim(item.ABAT1) ~= "EUX")
+		else if (trim(item.SIC) ~= "NBCC" and trim(item.SEARCHTYPE) ~= "EUX")
 		  {
 			"RecordTypeId": "012f4000000d9wxAAA",
 			"Is_Account_Activated__c": false,
@@ -78,115 +78,126 @@
 		  null
 		---
 		{
-		  "X1st_Address_Number__c": (( item.ABAN81 as Number ) + 90000000),
-		  "X2nd_Address_Number__c": ((item.ABAN82 as Number )+ 90000000) ,  
-		  "X3rd_Party_Billing__c": ((item.ABAN83 as Number) + 90000000),
-		  "Name": trim(item.ABALPH),
-		  "AccountNumber": ((item.ABAN8 as Number) + 90000000),
-		  "RecordType": recordType,
-		  "Address_Type__c": concatKeyValue(item.BILLINGADDRESSTYPEDRKY, item.BILLINGADDRESSTYPEDRDL01, trim(item.ABAT1)),
-		  "Alpha_Name__c": trim(item.ABALPH),
-		  "Bill_To_Number__c": ((item.ABAN81 as Number) + 90000000),
-		  "Customer_Service_Coordinator_Code__c": concatKeyValue(item.COORDINATORCODEDRKY, item.COORDINATORCODEDRDL01, trim(item.ABAC05)),
-		  "DunsNumber": trim(item.ABDUNS),
-		  "Effective_Date__c": julianToStandard(item.ABEFTB) default "",
-		  "NumberOfEmployees": item.ABNOE,
-		  "Growth_Rate__c": item.ABGROWTHR,
-		  "JDE_AddressNumber__c": ((item.ABAN8 as Number) + 90000000),
-		  "Long_Address_Number__c": trim(item.ABALKY),
-		  "NBCA_Market__c": concatKeyValue(item.NBCAMARKETDRKY, item.NBCAMARKETDRDL01, trim(item.ABAC08)),
-		  "NBCA_MKT_DES__c": concatKeyValue(item.NBCAMKTDESDRKY, item.NBCAMKTDESDRDL01, trim(item.ABAC08)),
-		  "NTN_ADV_PRC_GRP__c": if (!isEmpty(item.NTNADVPRCGRPDRDL01) and !isEmpty(item.NTNADVPRCGRPDRKY))
-			  trim(item.NTNADVPRCGRPDRKY) default "" ++ "-" ++ trim(item.NTNADVPRCGRPDRDL01) default ""
-			else
-			  "",
-		   "NTN_Company_Name__c": trim(item.ABSIC),
-		  "NTN_Cust_Type__c": concatKeyValue(item.NTNCUSTTYPEDRKY, item.NTNCUSTTYPEDRDL01, trim(item.ABAC08)),
-		  "NTN_Customer_Group__c": concatKeyValue(item.NTNCUSTOMERGROUPDRKY, item.NTNCUSTOMERGROUPDRDL01, trim(item.ABAC10)),
-		  "NTN_Global_Market__c": concatKeyValue(item.NTNGLOBALMARKETDRKY, item.NTNGLOBALMARKETDRDL01, trim(item.ABAC12)),
+		  "X1st_Address_Number__c": (( item.BILLTONUM1 as Number ) + 90000000) default 0,
+		  "X2nd_Address_Number__c": ((item.BILLTONUM2 as Number )+ 90000000)  default 0,  
+		  "X3rd_Party_Billing__c": ((item.BILLTONUM3 as Number) + 90000000)  default 0,
+		 "Name": trim(item.BILLTONAME),
+		  "AccountNumber": ((item.SHIPTONUM as Number) + 90000000) default 0,
+		  "RecordType": recordType."RecordTypeId", 
+          "Status__c": recordType."Status__c",
+          "Is_Account_Activated__c": recordType."Is_Account_Activated__c",
+          "Type": recordType."Type",
+          "Integration_Complete__c": recordType."Integration_Complete__c",
+		  "Address_Type__c": concatKeyValue(item.SEARCHTYPE, item.SEARCHTYPENAME, trim(item.SEARCHTYPE)), //this needs to be mapped to search type
+		  "Alpha_Name__c": trim(item.SHIPTONAME),
+		  "Bill_To_Number__c": ((item.BILLTONUM1 as Number) + 90000000) default 0,
+		  "Customer_Service_Coordinator_Code__c": concatKeyValue(item.CSR, item.CSRNAME, trim(item.ABAC05)),
+		  "DunsNumber": trim(item.DUNSNUMBER),
+		  "Effective_Date__c": julianToStandard(trim(item.EFFDATE)) default "",
+		  "NumberOfEmployees": item.ABNOE default 0,
+		  "Growth_Rate__c": item.ABGROWTHR default 0,
+		  "JDE_AddressNumber__c": ((item.SHIPTONUM as Number) + 90000000),
+		  "Long_Address_Number__c": trim(item.ABALKY) default "",
+		  "NBCA_Market__c": concatKeyValue(item.NBCAMARKETDRKY, item.NBCAMKTNAME, trim(item.NBCAMKT)),
+		  "NBCA_MKT_DES__c": concatKeyValue(trim(item.NBCAMKTDESDRKY), trim(item.NBCAMKTDESDRDL01), trim(item.ABAC08)),
+          "NTN_ADV_PRC_GRP__c": concatKeyValue(trim(item.NTNADVPRCGRPNAME),trim(item.NTNADVPRCGRPNAME),""),
+		  "NTN_Company_Name__c": trim(item.SIC),
+		  "NTN_Cust_Type__c": concatKeyValue(trim(item.CTYPE), trim(item.CTYPENAME), trim(item.ABAC08)),
+		  "NTN_Customer_Group__c": concatKeyValue(item.CUSTGROUP, item.CUSTGROUPNAME, trim(item.ABAC10)),
+		  "NTN_Global_Market__c": concatKeyValue(item.GLOBALMKT, item.GLOBALMKTNAME, trim(item.ABAC12)),
 		  "NTN_Market_Code__c": concatKeyValue(item.NBCAMKTDESDRKY, item.NBCAMKTDESDRDL01, trim(item.ABAC08)),
-		  "Region__c": concatKeyValue(item.REGIONDRKY, item.REGIONDRDL01, trim(item.ABAC02)),
-		  "Rep_Code__c": concatKeyValue(item.REPCODEDRKY, item.REPCODEDRDL01, trim(item.ABAC04)),
-		  "Sic": trim(item.ABSIC),
-		  "SicDesc": trim(item.SicDesc),
-		  "YearStarted": trim(item.ABYEARSTAR),
-		  "Mailing_Name__c": trim(item.MAILINGNAME),
-		  "Bill_To_Fax__c": if(!isEmpty(item.BILLFAXWPAR1) and !isEmpty(item.BILLFAXWPPH1))["(", trim(item.BILLFAXWPAR1), ")", " ", trim(item.BILLFAXWPPH1)] joinBy "" else "",
-		  "Bill_To_Phone__c":if(!isEmpty(item.BILLPHONEWPAR1) and !isEmpty(item.BILLPHONEWPPH1))["(", trim(item.BILLPHONEWPAR1), ")", " ", trim(item.BILLPHONEWPPH1)] joinBy "" else "",
+		  "Region__c": concatKeyValue(item.REG, item.REGNAME, trim(item.ABAC02)),
+		  "Rep_Code__c": concatKeyValue(item.REP, item.REPNAME, trim(item.ABAC04)),
+		  "Sic": trim(item.SIC),
+		  "SicDesc": trim(item.SICNAME),
+		  "YearStarted": trim(item.ABYEARSTAR) default "",
+		  "Mailing_Name__c": trim(item.MAILNAME),
+		  "Bill_To_Fax__c": item.BILLFAX,
+		  "Bill_To_Phone__c":item.BILLPHONE,
 
-		  "Fax": if(!isEmpty(item.BILLFAXABAN8WPAR1) and !isEmpty(item.BILLFAXABAN8WPPH1)) ["(", trim(item.BILLFAXABAN8WPAR1), ")", " ", trim(item.BILLFAXABAN8WPPH1)] joinBy "" else "",
-		  "Phone": if(!isEmpty(item.PHONEWPAR1) and !isEmpty(item.PHONEWPPH1)) ["(", trim(item.PHONEWPAR1), ")", " ", trim(item.PHONEWPPH1)] joinBy "" else "",
-		  "Website": trim(item.WEBSITEEAEMAL),
+		  "Fax": item.SHIPFAX,
+		  "Phone": item.SHIPPHONE,
+		  "Website": trim(item.WEBSITE),
 		  "BillingAddress": {
 			"BillingStreet": trim([
-			  trim(item.BILLINGADDRESSALADD1) ++ " \n " default "",
-			  trim(item.BILLINGADDRESSALADD2) ++ " \n " default "",
-			  trim(item.BILLINGADDRESSALADD3) ++ " \n " default "",
-			  trim(item.BILLINGADDRESSALADD4)
+			  trim(item.BILLADD1) ++ " \n " default "",
+			  trim(item.BILLADD2) ++ " \n " default "",
+			  trim(item.BILLADD3) ++ " \n " default "",
+			  trim(item.BILLADD4)
 			] filter (!isEmpty($)) joinBy ""),
-			"BillingCity": trim(item.BILLINGADDRESSALCTY1),
-			"BillingStateCode": trim(item.BILLINGADDRESSALADDS),
-			"BillingPostalCode": trim(item.BILLINGADDRESSALADDZ),
-			"BillingCountryCode":  trim(item.BILLINGCOUNTRYCODEVALUE),
+			"BillingCity": trim(item.BILLCTY1),
+			"BillingStateCode": trim(item.BILLADDS),
+			"BillingPostalCode": trim(item.BILLADDZ),
+//CASE --> FOR BILLING COUNTRY CODE
+//WHEN (TRIM(TO_CHAR(ALCTR)) IS NOT NULL OR TRIM(TO_CHAR(ALCTR)) != '') THEN TRIM(TO_CHAR(ALCTR))
+//WHEN (TRIM(TO_CHAR(ALCTR)) IS NULL OR TRIM(TO_CHAR(ALCTR)) = '') AND TRIM(TO_CHAR(ABSIC)) = 'NBCC'
+//THEN 'CA'	ELSE 'US'
+      "BillingCountryCode": 
+  if (!isEmpty(trim(item.CTRBILL))) upper(substring(trim(item.CTRBILL), 0, 2)) 
+  else if (isEmpty(trim(item.CTRBILL)) and !isEmpty(item.SIC) and trim(item.SIC) == 'NBCC') 'CA' 
+    else 'US',
 		  },
 		  "ShippingAddress": {
 			"ShippingStreet": trim([
-			  trim(item.SHIPPINGADDRESSALADD1)  ++ " \n " default "",
-			  trim(item.SHIPPINGADDRESSALADD2) ++ " \n " default "",
-			  trim(item.SHIPPINGADDRESSALADD3) ++ " \n " default "",
-			  trim(item.SHIPPINGADDRESSALADD4)
+			  trim(item.SHIPADD1)  ++ " \n " default "",
+			  trim(item.SHIPADD2) ++ " \n " default "",
+			  trim(item.SHIPADD3) ++ " \n " default "",
+			  trim(item.SHIPADD4)
 			] filter (!isEmpty($)) joinBy ""),
-			"ShippingCity": trim(item.SHIPPINGADDRESSALCTY1),
-			"ShippingStateCode": trim(item.SHIPPINGADDRESSALADDS),
-			"ShippingPostalCode": trim(item.SHIPPINGADDRESSALADDZ),
-			"ShippingCountryCode": trim(item.SHIPPINGCOUNTRYCODEVALUE),
+			"ShippingCity": trim(item.SHIPCTY1),
+			"ShippingStateCode": trim(item.SHIPADDS),
+			"ShippingPostalCode": trim(item.SHIPADDZ),
+//CASE --> FOR SHIPPING COUNTRY CODE
+//WHEN (TRIM(TO_CHAR(ALCTR)) IS NOT NULL OR TRIM(TO_CHAR(ALCTR)) != '') THEN TRIM(TO_CHAR(ALCTR))
+//WHEN (TRIM(TO_CHAR(ALCTR)) IS NULL OR TRIM(TO_CHAR(ALCTR)) = '') AND TRIM(TO_CHAR(ABSIC)) = 'NBCC'
+//THEN 'CA'	ELSE 'US'
+      "ShippingCountryCode": 
+  if (!isEmpty(trim(item.CTRSHIP))) upper(substring(trim(item.CTRSHIP), 0, 2)) 
+  else if (isEmpty(trim(item.CTRSHIP)) and !isEmpty(item.SIC) and trim(item.SIC) == 'NBCC') 'CA' 
+    else 'US',
 		  },
-		  ("Parent": trim(item.PARENTAXDC)) if (!isEmpty(item.PARENTAXDC)),
-		  "Parent_Number__c": ((trim(item.ABAN86) as Number) + 90000000),
-		  "CurrencyIsoCode": item.CURRENCYISOCODEAICRCD,
-		  "Billing_Address_Type__c": 
-			if (!isEmpty(item.BILLINGADDRESSTYPEDRDL01) and !isEmpty(item.BILLINGADDRESSTYPEDRKY))
-			  trim(item.BILLINGADDRESSTYPEDRKY) default "" ++ "-" ++ trim(item.BILLINGADDRESSTYPEDRDL01) default ""
-			else
-			  "",
+		  "Parent": trim(item.PARENTID),
+		  "Parent_Number__c": ((trim(item.PARENTNUM) as Number) + 90000000),
+		  "CurrencyIsoCode": item.CURRCODE,
+		  "Billing_Address_Type__c" : concatKeyValue(trim(item.BILLTYPENAME), trim(item.BILLTYPENAME), "" ),
 		  "Credit_Limit__c": 
-			if (!isEmpty(item.F03012TABLEAIACL))
-			  trim(item.F03012TABLEAIACL)
+			if (!isEmpty(item.AIACL))
+			  trim(item.AIACL)
 			else
 			  "",
-		  "Credit_Manager__c": concatKeyValue(item.CREDITMANAGERDRKY, item.CREDITMANAGERDRDL01, trim(item.F03012TABLEAICMGR)),
-		  "Customer_Price_Group_40PC__c": concatKeyValue(item.CUSTOMERPRICEGROUPDRKY, item.CUSTOMERPRICEGROUPDRDL01, trim(item.F03012TABLEAICPGP)),
+		  "Credit_Manager__c": concatKeyValue(item.CREDITMGR, item.CRMGRNAME, trim(item.AICMGR)),
+		  "Customer_Price_Group_40PC__c": concatKeyValue(item.CUSTPRICEGRP, item.CUSTPRICENAME, trim(item.AICPGP)),
 		  "Date_Account_Opened__c":  // Convert date to julian format,
-			if (!isEmpty(item.F03012TABLEAIDAOJ))
-			  julianToStandard(trim(item.F03012TABLEAIDAOJ))
+			if (!isEmpty(item.AIDAOJ))
+			  julianToStandard(trim(item.AIDAOJ))
 			else
 			  "",
 		  "Date_Of_Last_Credit_Review__c":  // Convert date to julian format,
-			if (!isEmpty(item.F03012TABLEAIDLC))
-			  julianToStandard(trim(item.F03012TABLEAIDLC))
+			if (!isEmpty(item.AIDLC))
+			  julianToStandard(trim(item.AIDLC))
 			else
 			  "",
-		  "Dun_Bradstreet_Rating__c": concatKeyValue(item.DUNBRADSTREETDRKY, item.DUNBRADSTREETDRDL01, trim(item.F03012TABLEAIDB)),
+		  "Dun_Bradstreet_Rating__c": concatKeyValue(item.DB, item.DNBNAME, trim(item.AIDB)),
 		  "Factor_Special_Payee__c": 
-			if (!isEmpty(item.F03012TABLEAIARPY))
-			  trim(item.F03012TABLEAIARPY)
+			if (!isEmpty(item.AIARPY))
+			  trim(item.AIARPY)
 			else
 			  "",
-		  "Hold_Orders_Code__c":  concatKeyValue(item.HOLDORDERSDRKY, item.HOLDORDERSDRDL01, trim(item.F03012TABLEAIHOLD)),
+		  "Hold_Orders_Code__c":  concatKeyValue(item.HOLD, item.HOLDNAME, trim(item.AIHOLD)),
 		
-		  "Payment_Terms_A_R__c": concatKeyValue(item.PAYMENTPNPTC, item.PAYMENTPNPTD, trim(item.F03012TABLEAITRAR)),
-		  "Print_Message__c": concatKeyValue(item.PRINTMESSAGEDRKY, item.PRINTMESSAGEDRDL01, trim(item.F03012TABLEAIINMG)),
-		  "Temporary_Credit_Message__c": concatKeyValue(item.TEMPORARYCREDITMESSAGEDRKY, item.TEMPORARYCREDITMESSAGEDRDL01, trim(item.F03012TABLEAITSTA)),
-		  "Branch_Code__c": trim(item.BRANCHCODEAXEXRA),
-		  "Owner": trim(item.OWNERCUALPH3),
-		  "Account_Coordinator__c": trim(item.ACCOUNTCOORDINATORCUALPH3),
-		  "Engineer__c": concatKeyValue(item.ENGINEERDRKY, item.ENGINEERDRDL01, trim(item.F03012TABLEAIAC06)),
-		  ("Bill_To_Account__c": trim(item.BILLACCOUNT)) if (!isEmpty(trim(item.BILLACCOUNT))),
-		  "Account_Engineer__c": trim(item.accountEngineer),
-		  "Account_Marketing_Rep__c": trim(item.ACCOUNTMARKETINGREP),
-		  "MKT_REP__c": concatKeyValue(item.MKTREPDRKY, item.MKTREPDRDL01, trim(item.F03012TABLEAIAC05)),
+		  "Payment_Terms_A_R__c": concatKeyValue(item.PAYCODE, item.PAYNAME, trim(item.AITRAR)),
+		  "Print_Message__c": concatKeyValue(item.PRINTMSG, item.PRINTMSGNAME, trim(item.AIINMG)),
+		  "Temporary_Credit_Message__c": concatKeyValue(item.TEMPCRMSG, item.TEMPCRNAME, trim(item.AITSTA)),
+		  "Branch_Code__c": trim(item.BRNCHCODE),
+		  "Owner": trim(item.REPID),
+		  "Account_Coordinator__c": trim(item.CSRID),
+		  "Engineer__c": concatKeyValue(item.ENGINEER, item.ENGNAME, trim(item.AIAC05)),
+      "MKT_REP__c": concatKeyValue(item.MKTREP, item.MKTNAME, trim(item.AIAC06)),
+      "Account_Engineer__c": trim(item.ENGID),
+		  "Account_Marketing_Rep__c": trim(item.MKTID),
+		  "Bill_To_Account__c": trim(item.BILLTOID),
 		  "NTN_Company_Number__c": 
-			if (trim(item.ABSIC) ~= "NBCC")
+			if (trim(item.SIC) ~= "NBCC")
 			  "00010"
 			else
 			  "00001"

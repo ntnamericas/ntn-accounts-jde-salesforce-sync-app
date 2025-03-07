@@ -51,6 +51,7 @@ http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/em
 			doc:id="7f98734c-00b4-4ce2-adb5-1d247b3dff6c" key="previousJobRun" objectStore="Object_store_Previous_Job_Run">
 			<os:value><![CDATA[#[vars.jobRun]]]></os:value>
 		</os:store>
+		<error-handler ref="global-error-handler" />
 	</flow>
 	<sub-flow name="jde-to-sf-app-sub-flow" doc:id="bdca494a-f953-4135-bf4a-da2e2d264754" >
 		<ee:transform doc:name="format-sql query" doc:id="41832f94-b4d6-45d5-b8fb-669625e1ff55" >
@@ -135,8 +136,8 @@ map ((item) ->
 
     <!-- Send Email -->
 										<try doc:name="Try" doc:id="9d5765f7-5676-4684-b3e0-18ba3c662439" >
-											<email:send doc:name="Send" doc:id="1487d3f2-a2b3-4bd0-9f0b-6a9a6061ec79" fromAddress="${secure::smtp.user}" subject="Error Payload for Accounts" toAddresses="#[p('smtp.to') splitBy &quot;,&quot;]" config-ref="Email_SMTP">
-									<email:body contentType="text/plain" encoding="UTF-8">
+											<email:send doc:name="Send" doc:id="1487d3f2-a2b3-4bd0-9f0b-6a9a6061ec79" subject="Error Payload for Accounts" config-ref="NTN-SMTP-Details" toAddresses="#[p('smtp.to') splitBy &quot;,&quot;]">
+												<email:body contentType="text/plain" encoding="UTF-8">
 										<email:content><![CDATA[#["Hi Team, 
 Please find error and IDs attached."]]]></email:content>
 									</email:body>

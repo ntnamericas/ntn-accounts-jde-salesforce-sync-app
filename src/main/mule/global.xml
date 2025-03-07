@@ -70,8 +70,8 @@ http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/sc
 	<global-property doc:name="Global Property"
 		doc:id="3ee61aa3-577a-4ca9-b056-db0909e0315b" name="encrypt.key"
 		value="replaceme" />
-	<email:smtp-config name="Email_SMTP"
-		doc:name="Email SMTP" doc:id="ab328f7c-f462-4868-a409-e6df5c18592d">
+	<email:smtp-config name="NTN-SMTP-Details"
+		doc:name="Email SMTP" doc:id="ab328f7c-f462-4868-a409-e6df5c18592d" from="${secure::smtp.user}">
 		<email:smtp-connection host="${smtp.host}"
 			port="${smtp.port}" user="${secure::smtp.user}"
 			password="${secure::smtp.password}">
