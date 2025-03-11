@@ -2,6 +2,7 @@
 output application/java 
 ---
 payload map (record) -> {
+
  "X1st_Address_Number__c": record.X1st_Address_Number__c default "" ,
  "X2nd_Address_Number__c": record.X2nd_Address_Number__c default "",
  "X3rd_Party_Billing__c": record.X3rd_Party_Billing__c default "" ,
@@ -13,7 +14,7 @@ payload map (record) -> {
  "Bill_To_Number__c": record.Bill_To_Number__c default "",
  "Customer_Service_Coordinator_Code__c": record.Customer_Service_Coordinator_Code__c default "",
  "Duns_Number__c": record.DunsNumber default "",
-  "Effective_Date__c": if (trim(record.Effective_Date__c) == "" or trim(record.Effective_Date__c==0)) "" else record.Effective_Date__c as Date ,
+ "Effective_Date__c": if (record.Effective_Date__c == 0) "" else record.Effective_Date__c as Date ,
  "NumberOfEmployees": record.NumberOfEmployees default "",
  "Growth_Rate__c": record.Growth_Rate__c default "" ,
  "JDE_AddressNumber__c": record.JDE_AddressNumber__c default "",
@@ -30,9 +31,8 @@ payload map (record) -> {
  "Rep_Code__c": record.Rep_Code__c default "",
  "Sic": record.Sic default "",
  "SicDesc": record.SicDesc default "",
- "Year_Started__c" : record.YearStarted,
- "Status__c": record.Status__c default "",
- "Type": record."Type" default "" ,
+ "Status__c": record.Status__c,
+ "Type": record.Type default "" ,
  "Year_Started__c": record.Year_Started__c default "",
  "Mailing_Name__c":record.Mailing_Name__c default "",
  "Bill_To_Fax__c": record.Bill_To_Fax__c default "" ,
@@ -40,9 +40,8 @@ payload map (record) -> {
  "Fax": record.Fax default "",
  "Phone": record.Phone default "",
  "Website": record.Website default "",
- "Parent_Number__c": if (record.JDE_AddressNumber__c == record.Parent_Number__c) "" else record.Parent_Number__c,
+ "Parent_Number__c": record.Parent_Number__c default "",
  "CurrencyIsoCode": record.CurrencyIsoCode default "",
- "Billing_Address_Type__c": record.Billing_Address_Type__c default "" ,
  "Credit_Limit__c": record.Credit_Limit__c default "",
  "Credit_Manager__c": record.Credit_Manager__c default "",
  "Customer_Price_Group_40PC__c": record.Customer_Price_Group_40PC__c default "",
@@ -60,7 +59,7 @@ payload map (record) -> {
  "Engineer__c": record.Engineer__c default "",
  "Bill_To_Account__c": record.Bill_To_Account__c default "",
  "Account_Engineer__c": record.Account_Engineer__c default "",
- "Integration_Complete__c": record.Integration_Complete__c ,
+ "Integration_Complete__c": record.Integration_Complete__c  ,
  "Is_Account_Activated__c": record.Is_Account_Activated__c ,
  "Account_Marketing_Rep__c": record.Account_Marketing_Rep__c default "",
  "MKT_REP__c": record.MKT_REP__c default "",

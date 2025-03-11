@@ -39,7 +39,7 @@
 		pvalue)
 	---
 	payload map (item, index) -> (do {
-var recordType = if (trim(item.SIC) ~= "NBCC" and trim(item.SEARCHTYPE) ~= "C")
+		var recordType = if (trim(item.SIC) ~= "NBCC" and trim(item.SEARCHTYPE) ~= "C")
 		  {
 			"RecordTypeId": "012f4000000MFV5AAO",
 			"Is_Account_Activated__c": true,
@@ -93,14 +93,14 @@ var recordType = if (trim(item.SIC) ~= "NBCC" and trim(item.SEARCHTYPE) ~= "C")
 		  "Bill_To_Number__c": ((item.BILLTONUM1 as Number) + 90000000) default 0,
 		  "Customer_Service_Coordinator_Code__c": concatKeyValue(item.CSR, item.CSRNAME, trim(item.ABAC05)),
 		  "DunsNumber": trim(item.DUNSNUMBER),
-		  "Effective_Date__c": julianToStandard(trim(item.EFFDATE)) default "",
+		  "Effective_Date__c": julianToStandard(item.ABEFTB) default "",
 		  "NumberOfEmployees": item.ABNOE default 0,
 		  "Growth_Rate__c": item.ABGROWTHR default 0,
 		  "JDE_AddressNumber__c": ((item.SHIPTONUM as Number) + 90000000),
 		  "Long_Address_Number__c": trim(item.ABALKY) default "",
-		  "NBCA_Market__c": concatKeyValue(item.NBCAMARKETDRKY, item.NBCAMKTNAME, trim(item.NBCAMKT)),
-		  "NBCA_MKT_DES__c": concatKeyValue(trim(item.NBCAMKTDESDRKY), trim(item.NBCAMKTDESDRDL01), trim(item.ABAC08)),
-          "NTN_ADV_PRC_GRP__c": concatKeyValue(trim(item.NTNADVPRCGRPNAME),trim(item.NTNADVPRCGRPNAME),""),
+		  "NBCA_Market__c": concatKeyValue(item.NBCAMKT, item.NBCAMKTNAME, trim(item.NBCAMKT)),
+		  "NBCA_MKT_DES__c": concatKeyValue(trim(item.NBCAMKTDES), trim(item.NBCAMKTDESNAME), trim(item.NBCAMKTDES)),
+          "NTN_ADV_PRC_GRP__c": concatKeyValue(trim(item.NTNADVPRICE),trim(item.NTNADVPRCGRPNAME),""),
 		  "NTN_Company_Name__c": trim(item.SIC),
 		  "NTN_Cust_Type__c": concatKeyValue(trim(item.CTYPE), trim(item.CTYPENAME), trim(item.ABAC08)),
 		  "NTN_Customer_Group__c": concatKeyValue(item.CUSTGROUP, item.CUSTGROUPNAME, trim(item.ABAC10)),
@@ -159,7 +159,7 @@ var recordType = if (trim(item.SIC) ~= "NBCC" and trim(item.SEARCHTYPE) ~= "C")
 		  "Parent": trim(item.PARENTID),
 		  "Parent_Number__c": ((trim(item.PARENTNUM) as Number) + 90000000),
 		  "CurrencyIsoCode": item.CURRCODE,
-		  "Billing_Address_Type__c" : concatKeyValue(trim(item.BILLTYPENAME), trim(item.BILLTYPENAME), "" ),
+		  "Billing_Address_Type__c" : concatKeyValue(trim(item.BILLTYPE), trim(item.BILLTYPENAME), "" ),
 		  "Credit_Limit__c": 
 			if (!isEmpty(item.AIACL))
 			  trim(item.AIACL)
@@ -192,8 +192,8 @@ var recordType = if (trim(item.SIC) ~= "NBCC" and trim(item.SEARCHTYPE) ~= "C")
 		  "Owner": trim(item.REPID),
 		  "Account_Coordinator__c": trim(item.CSRID),
 		  "Engineer__c": concatKeyValue(item.ENGINEER, item.ENGNAME, trim(item.AIAC05)),
-      "MKT_REP__c": concatKeyValue(item.MKTREP, item.MKTNAME, trim(item.AIAC06)),
-      "Account_Engineer__c": trim(item.ENGID),
+		  "MKT_REP__c": concatKeyValue(item.MKTREP, item.MKTNAME, trim(item.AIAC06)),
+		  "Account_Engineer__c": trim(item.ENGID),
 		  "Account_Marketing_Rep__c": trim(item.MKTID),
 		  "Bill_To_Account__c": trim(item.BILLTOID),
 		  "NTN_Company_Number__c": 

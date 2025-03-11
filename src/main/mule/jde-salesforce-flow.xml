@@ -99,7 +99,7 @@ output application/json
 							<logger level="INFO" doc:name="Message before upserting" doc:id="292bbbb1-065b-4738-8849-c68d8366cee1" message="Batch Processing Started" />
 							<batch:aggregator doc:name="Batch Aggregator" doc:id="83238bbf-257e-4800-88eb-19b4eea85374" size="100">
 								<choice doc:name="Choice" doc:id="a5555369-afbc-4cf2-b7d7-3051c45c18e7">
-									<when expression="#[payload != {}]">
+									<when expression="#[!isEmpty(payload[0])]">
 										<ee:transform doc:name="Transform Message" doc:id="4927c249-c77e-42f8-ac69-a0e3988cca50">
 									<ee:message>
 										<ee:set-payload><![CDATA[%dw 2.0
@@ -163,7 +163,7 @@ output application/json
 										</try>
 									</when>
 									<otherwise>
-										<logger level="INFO" doc:name="Logger" doc:id="bff5efae-6a5d-44a2-9baf-cb78e7403a80" message="Composite Error Payload " />
+										<logger level="INFO" doc:name="Logger" doc:id="bff5efae-6a5d-44a2-9baf-cb78e7403a80" message="All Account Upserts Successful. Please validate the Accounts on Salesforce." />
 									</otherwise>
 								</choice>
 							</batch:aggregator>
