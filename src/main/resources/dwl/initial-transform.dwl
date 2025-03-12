@@ -177,7 +177,7 @@
 			  julianToStandard(trim(item.AIDLC))
 			else
 			  "",
-		  "Dun_Bradstreet_Rating__c": concatKeyValue(item.DB, item.DNBNAME, trim(item.AIDB)),
+		  "Dun_Bradstreet_Rating__c": concatKeyValue(trim(item.DB), trim(item.DNBNAME), trim(item.AIDB)),
 		  "Factor_Special_Payee__c": 
 			if (!isEmpty(item.AIARPY))
 			  trim(item.AIARPY)
