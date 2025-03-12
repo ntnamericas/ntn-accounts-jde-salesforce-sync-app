@@ -102,33 +102,7 @@ output application/json
 									<when expression="#[!isEmpty(payload[0])]">
 										<ee:transform doc:name="Transform Message" doc:id="4927c249-c77e-42f8-ac69-a0e3988cca50">
 									<ee:message>
-										<ee:set-payload><![CDATA[%dw 2.0
-output application/csv header=true
----
-(payload map ((item) -> 
-    if (item is Binary) 
-        read(item as String {encoding: "UTF-8"}, "application/json") 
-    else if (item is String)
-        read(item, "application/json") 
-    else if (item is Object) 
-        item 
-    else 
-        {error: "Unsupported type", item: item}
-)) 
-filter ((item) -> 
-    item != null and item != {}
-) 
-map ((item) -> 
-    {
-        Error: (item.error[0] default "") as String,
-        ID: (item.id[0] default "") as String,
-        Data: 
-            "---\n" ++ 
-            (write(item.data[0] default {}, "application/json", {indent: true})) 
-            // Pretty-print JSON data for readability
-    }
-)
-]]></ee:set-payload>
+												<ee:set-payload resource="dwl/createPayloadForNotificationEmail.dwl" />
 									</ee:message>
 								</ee:transform>
 
@@ -147,15 +121,7 @@ Please find error and IDs attached."]]]></email:content>
 												<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="1ff8b651-69ec-4938-8bc0-957c69065d31" type="ANY">
 													<ee:transform doc:name="Transform Message" doc:id="c3fb84ac-149e-424a-844f-99d506b779ab" >
 														<ee:message >
-															<ee:set-payload ><![CDATA[%dw 2.0
-output application/json
----
-{
-    "Error_Type": error.errorType.asString,
-    "Description" : error.description ,
-    "Detailed Description": error.detailedDescription
-}
- ]]></ee:set-payload>
+															<ee:set-payload resource="dwl/emailErrorHandling.dwl" />
 														</ee:message>
 													</ee:transform>
 												</on-error-continue>
@@ -184,39 +150,14 @@ output application/json
 					</salesforce:upsert>
 							<ee:transform doc:name="Transform Message" doc:id="e159fffa-439a-4f4f-9bab-bd5e5d3e4713">
 			<ee:message>
-				<ee:set-payload><![CDATA[%dw 2.0
-output application/json
----
-{
-    successful: payload.items filter $.successful == true map {
-        id: $.id,
-        payload: $.payload
-    },
-    unsuccessful: payload.items filter $.successful == false map {
-        id: $.id,
-        errorMessage: $.message,
-        errorDetails: $.payload.errors map {
-            message: $.message,
-            statusCode: $.statusCode,
-            Error : $.payload
-        }
-    }
-}]]></ee:set-payload>
+									<ee:set-payload resource="dwl/payloadAfterUpsert.dwl" />
 			</ee:message>
 		</ee:transform>
 							<choice doc:name="Choice" doc:id="db2aea8f-a3b3-427d-b37f-89e92ca5d9f5">
 								<when expression="#[(payload.unsuccessful !=[]) and (payload.successful == [])]">
 							<ee:transform doc:name="Transform Message" doc:id="7182cb61-3fa4-4b3e-a67c-c4673a015e05">
 										<ee:message>
-											<ee:set-payload><![CDATA[%dw 2.0
-output application/json
----
-{
-	"data" : vars.sfData ,
-    "error": payload.unsuccessful.errorMessage,
-    "id": payload.unsuccessful.id
-}
- ]]></ee:set-payload>
+											<ee:set-payload resource="dwl/unsuccessfulLogging.dwl" />
 										</ee:message>
 										<ee:variables>
 										</ee:variables>
