@@ -64,10 +64,13 @@ readUrl("classpath://queryScript/sqlScript-$(p('mule.env')).dwl","text/plain")]]
 		</ee:transform>
 		<ee:dynamic-evaluate doc:name="Dynamic Evaluate" doc:id="2518958f-d1aa-4cc3-b75a-4256322bd809" expression="#[payload]">
 		</ee:dynamic-evaluate>
-		<db:select doc:name="fetch-data-from-database" doc:id="cf8331cf-f8eb-41c8-ae03-64b793e1ad7c" config-ref="Oracle_JDE_Database_Config">
+		<try doc:name="Try" doc:id="9f3351a9-08e2-42db-8c22-e6616f417caa" >
+			<db:select doc:name="fetch-data-from-database" doc:id="cf8331cf-f8eb-41c8-ae03-64b793e1ad7c" config-ref="Oracle_JDE_Database_Config">
 			<reconnect />
-			<db:sql ><![CDATA[#[payload]]]></db:sql>
+			<db:sql><![CDATA[#[payload]]]></db:sql>
 		</db:select>
+			<error-handler ref="global-error-handler" />
+		</try>
 		<logger level="INFO" doc:name="Logger" doc:id="10519f79-0de8-4d7e-b727-693f9dee8953" message="Size of Payload from DB :  #[sizeOf(payload)]"/>
 		<choice doc:name="rounting-based-on-payload-fetched-from-db" doc:id="8c067b99-f588-47c4-9cda-af2bc32f92c9" tracking:enable-default-events="true">
 			<when expression="#[sizeOf(payload) &gt;0]">
@@ -117,15 +120,7 @@ Please find error and IDs attached."]]]></email:content>
 									</email:body>
 									<email:attachments><![CDATA[#[{ 'ErrorPayload.csv': payload }]]]></email:attachments>
 								</email:send>
-											<error-handler >
-												<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="1ff8b651-69ec-4938-8bc0-957c69065d31" type="ANY">
-													<ee:transform doc:name="Transform Message" doc:id="c3fb84ac-149e-424a-844f-99d506b779ab" >
-														<ee:message >
-															<ee:set-payload resource="dwl/emailErrorHandling.dwl" />
-														</ee:message>
-													</ee:transform>
-												</on-error-continue>
-											</error-handler>
+											<error-handler ref="global-error-handler" />
 										</try>
 									</when>
 									<otherwise>
@@ -134,6 +129,13 @@ Please find error and IDs attached."]]]></email:content>
 								</choice>
 							</batch:aggregator>
 							<logger level="INFO" doc:name="Logger" doc:id="240e959e-5c86-451c-9b36-1d03c0d5ce5f" message="#[payload]" />
+							<try doc:name="Try" doc:id="a10c0490-067f-4a6c-b903-f33deb027fc2" >
+								<salesforce:upsert doc:name="upsert-accounts-to-sf" doc:id="08a8ab27-1746-47f5-b662-8d31ee6a66d9" objectType="${salesforce.object}" externalIdFieldName="${salesforce.externalId}" config-ref="Salesforce_Config">
+						<reconnect-forever />
+						<salesforce:records><![CDATA[#[[payload]]]]></salesforce:records>
+					</salesforce:upsert>
+								<error-handler ref="global-error-handler" />
+							</try>
 							<ee:transform doc:name="Transform Message" doc:id="3c56da5d-3778-421c-9fee-b2826f227a4f">
 								<ee:message>
 								</ee:message>
@@ -144,10 +146,6 @@ output application/json
 [payload]]]></ee:set-variable>
 								</ee:variables>
 							</ee:transform>
-							<salesforce:upsert doc:name="upsert-accounts-to-sf" doc:id="08a8ab27-1746-47f5-b662-8d31ee6a66d9" objectType="${salesforce.object}" externalIdFieldName="${salesforce.externalId}" config-ref="Salesforce_Config">
-						<reconnect-forever />
-						<salesforce:records><![CDATA[#[[payload]]]]></salesforce:records>
-					</salesforce:upsert>
 							<ee:transform doc:name="Transform Message" doc:id="e159fffa-439a-4f4f-9bab-bd5e5d3e4713">
 			<ee:message>
 									<ee:set-payload resource="dwl/payloadAfterUpsert.dwl" />

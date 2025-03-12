@@ -105,7 +105,7 @@
 		  "NTN_Cust_Type__c": concatKeyValue(trim(item.CTYPE), trim(item.CTYPENAME), trim(item.ABAC08)),
 		  "NTN_Customer_Group__c": concatKeyValue(item.CUSTGROUP, item.CUSTGROUPNAME, trim(item.ABAC10)),
 		  "NTN_Global_Market__c": concatKeyValue(item.GLOBALMKT, item.GLOBALMKTNAME, trim(item.ABAC12)),
-		  "NTN_Market_Code__c": concatKeyValue(item.NBCAMKTDESDRKY, item.NBCAMKTDESDRDL01, trim(item.ABAC08)),
+		  "NTN_Market_Code__c": concatKeyValue(trim(item.NBCAMKTDES), trim(item.NBCAMKTDESNAME), trim(item.NBCAMKTDES)),
 		  "Region__c": concatKeyValue(item.REG, item.REGNAME, trim(item.ABAC02)),
 		  "Rep_Code__c": concatKeyValue(item.REP, item.REPNAME, trim(item.ABAC04)),
 		  "Sic": trim(item.SIC),
@@ -177,7 +177,7 @@
 			  julianToStandard(trim(item.AIDLC))
 			else
 			  "",
-		  "Dun_Bradstreet_Rating__c": concatKeyValue(item.DB, item.DNBNAME, trim(item.AIDB)),
+		  "Dun_Bradstreet_Rating__c": concatKeyValue(trim(item.DB), trim(item.DNBNAME), trim(item.AIDB)),
 		  "Factor_Special_Payee__c": 
 			if (!isEmpty(item.AIARPY))
 			  trim(item.AIARPY)
