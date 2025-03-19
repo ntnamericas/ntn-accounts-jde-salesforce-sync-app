@@ -27,7 +27,7 @@ http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/sc
 			user="${secure::db.user}" password="${secure::db.password}"
 			serviceName="${db.svc}" port="${db.port}">
 			<reconnection failsDeployment="true">
-				<reconnect count="5" />
+				<reconnect count="${reconnect.attempts}" frequency="${reconnect.frequency}"/>
 			</reconnection>
 		</db:oracle-connection>
 	</db:config>

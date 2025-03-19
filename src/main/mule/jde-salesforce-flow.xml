@@ -37,14 +37,14 @@ http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/em
 				<ee:set-variable resource="dwl/vars-jobRun.dwl" variableName="jobRun" />
 			</ee:variables>
 		</ee:transform>
-		<logger level="INFO" doc:name="jobRun logger" doc:id="54482bd7-6269-4bea-b2a1-f8b4ecc28bcf" message='#[%dw 2.0&#10;output application/java&#10;---&#10;"&#10;CurrentJobRunDetails : " ++ vars.jobRun.^raw]'/>
+		<logger level="INFO" doc:name="jobRun logger" doc:id="54482bd7-6269-4bea-b2a1-f8b4ecc28bcf" message='#[%dw 2.0&#10;output application/java&#10;---&#10;"\n&#10;CurrentJobRunDetails : " ++ vars.jobRun.^raw]'/>
 		<os:retrieve doc:name="retrievePreviousJobRun"
 			doc:id="58f9cd3c-67fc-46af-8e45-f31831aa8bb5" key="previousJobRun"
 			target="previousJobRun" objectStore="Object_store_Previous_Job_Run">
 			<os:default-value><![CDATA[#[vars.jobRun]]]></os:default-value>
 		</os:retrieve>
-		<logger level="INFO" doc:name="Logger" doc:id="29e6ece3-264f-427f-b194-fc94da9b4838" message='#[%dw 2.0&#10;output application/java&#10;---&#10;"&#10;LastjobRunDetails : " ++ vars.previousJobRun.^raw]'/>
-		<logger level="INFO" doc:name="Logger" doc:id="642c7f5b-d720-4986-a517-914ebb74cef4" message='Calling "jde-to-sf-app-sub-flow"'/>
+		<logger level="INFO" doc:name="Logger" doc:id="29e6ece3-264f-427f-b194-fc94da9b4838" message='#[%dw 2.0&#10;output application/java&#10;---&#10;"\n &#10;LastjobRunDetails : " ++ vars.previousJobRun.^raw]'/>
+		<logger level="INFO" doc:name="Logger" doc:id="642c7f5b-d720-4986-a517-914ebb74cef4" message='#["\n Calling jde-to-sf-app-sub-flow "]'/>
 		<flow-ref doc:name="jde-to-sf-app-sub-flow"
 			doc:id="b264356f-83ed-4901-946c-e20dfdaac094" name="jde-to-sf-app-sub-flow" />
 		<os:store doc:name="Store current job run details"
@@ -95,7 +95,7 @@ output application/json
 							<ee:set-payload resource="dwl/transformToSFFormat.dwl" />
 			</ee:message>
 		</ee:transform>
-				<logger level="INFO" doc:name="Logger" doc:id="f8756f2c-d14c-459a-903a-ea23ae3c8c47" message="#[payload]"/>
+				<logger level="DEBUG" doc:name="Logger" doc:id="f8756f2c-d14c-459a-903a-ea23ae3c8c47" message="#[payload]"/>
 				<batch:job jobName="jde-sf-accounts-batch-job" doc:id="deb5e095-21fa-4718-a971-7575161ecbc7" blockSize="${batch.size}" maxFailedRecords="-1">
 					<batch:process-records>
 						<batch:step name="jde-sf-accounts-batch-step" doc:id="df703d92-a454-4529-bfbb-c7112aead900">
@@ -120,11 +120,12 @@ Please find error and IDs attached."]]]></email:content>
 									</email:body>
 									<email:attachments><![CDATA[#[{ 'ErrorPayload.csv': payload }]]]></email:attachments>
 								</email:send>
+											<logger level="INFO" doc:name="Logger" doc:id="f7915719-02b9-407a-b7f6-42d21552403c" message='#["\n Accounts Upsert Email Sent."]'/>
 											<error-handler ref="global-error-handler" />
 										</try>
 									</when>
 									<otherwise>
-										<logger level="INFO" doc:name="Logger" doc:id="bff5efae-6a5d-44a2-9baf-cb78e7403a80" message="All Account Upserts Successful. Please validate the Accounts on Salesforce." />
+										<logger level="INFO" doc:name="Logger" doc:id="bff5efae-6a5d-44a2-9baf-cb78e7403a80" message='#["\n All Account Upserts Successful. Please validate the Accounts on Salesforce."]' />
 									</otherwise>
 								</choice>
 							</batch:aggregator>
@@ -160,7 +161,7 @@ output application/json
 										<ee:variables>
 										</ee:variables>
 									</ee:transform>
-							<async doc:name="Async" doc:id="a2201b17-4e56-40b2-81be-b8572380b1ae">
+									<async doc:name="Async" doc:id="a2201b17-4e56-40b2-81be-b8572380b1ae">
 								<logger level="INFO" doc:name="Logger" doc:id="38d7a558-d9f0-491e-bb33-699f4a3b8f8a" message="#[payload]" />
 							</async>
 								</when>
@@ -175,6 +176,17 @@ output application/json
 							</choice>
 						</batch:step>
 					</batch:process-records>
+					<batch:on-complete >
+						<ee:transform doc:name="Transform Message" doc:id="b33ece7e-c27a-4786-a377-fc8e2190b5e9">
+							<ee:message>
+								<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+							</ee:message>
+						</ee:transform>
+						<logger level="INFO" doc:name="Logger" doc:id="66615da5-8cb5-4c2a-9052-43913102e7ca" message="#['\n'] Final Accounts Processed Payload is ==&gt;  #[payload]" />
+					</batch:on-complete>
 				</batch:job>
 			</when>
 			<otherwise >
