@@ -4,7 +4,7 @@
 
 	<groupId>com.ntn</groupId>
 	<artifactId>ntn-accounts-jde-salesforce-sync-app</artifactId>
-	<version>1.1.0-rc6</version>
+	<version>1.1.0-rc8</version>
 	<packaging>mule-application</packaging>
 
 	<name>ntn-accounts-jde-salesforce-sync-app</name>
@@ -13,7 +13,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-		<app.runtime>4.6.9</app.runtime>
+		<app.runtime>4.8.1</app.runtime>
 		<mule.maven.plugin.version>4.3.0</mule.maven.plugin.version>
 	</properties>
 
@@ -30,7 +30,6 @@
 				<version>${mule.maven.plugin.version}</version>
 				<extensions>true</extensions>
 				<configuration>
-					<classifier>mule-application</classifier>
 					<sharedLibraries>
 						<sharedLibrary>
 							<groupId>com.mycompany</groupId>
@@ -56,11 +55,6 @@
 			<classifier>mule-plugin</classifier>
 		</dependency>
 		<dependency>
-			<groupId>com.mycompany</groupId>
-			<artifactId>ojdbc8-12.2.0.1</artifactId>
-			<version>0.1</version>
-		</dependency>
-		<dependency>
 			<groupId>org.mule.connectors</groupId>
 			<artifactId>mule-db-connector</artifactId>
 			<version>1.14.13</version>
@@ -70,12 +64,6 @@
 			<groupId>com.mulesoft.connectors</groupId>
 			<artifactId>mule-salesforce-connector</artifactId>
 			<version>10.22.9</version>
-			<classifier>mule-plugin</classifier>
-		</dependency>
-		<dependency>
-			<groupId>org.mule.connectors</groupId>
-			<artifactId>mule-file-connector</artifactId>
-			<version>1.5.3</version>
 			<classifier>mule-plugin</classifier>
 		</dependency>
 		<dependency>
@@ -95,6 +83,11 @@
 			<artifactId>mule-email-connector</artifactId>
 			<version>1.7.4</version>
 			<classifier>mule-plugin</classifier>
+		</dependency>
+		<dependency>
+			<groupId>com.mycompany</groupId>
+			<artifactId>ojdbc8-12.2.0.1</artifactId>
+			<version>0.1</version>
 		</dependency>
 	</dependencies>
 
