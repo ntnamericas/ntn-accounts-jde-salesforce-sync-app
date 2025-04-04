@@ -1,11 +1,14 @@
 %dw 2.0
-output application/csv header=true
-var parsedPayload = payload flatMap (item) -> read(item, "application/json")
+output application/json
+var parsedPayload = payload map (item) -> read(item, "application/json")
+
+var finalPayload = parsedPayload filter ((item, index) -> item != null )
 ---
 
-parsedPayload map (item) -> { 
+finalPayload map (item) -> { 
     "ID": item.id default "N/A",
     "Message": item.message default "",
-    "ErrorMessage": item."error message" default "",
-    "StatusCode": item."Status Code" default ""
+    "ErrorMessage": item."Error Message" default "",
+    "StatusCode": item."Status Code" default "",
+    "FailedPayload" : flatten(item.failedPayload)
 }

@@ -4,7 +4,7 @@
 
 	<groupId>com.ntn</groupId>
 	<artifactId>ntn-accounts-jde-salesforce-sync-app</artifactId>
-	<version>1.1.0-rc8</version>
+	<version>1.1.0-rc10</version>
 	<packaging>mule-application</packaging>
 
 	<name>ntn-accounts-jde-salesforce-sync-app</name>
