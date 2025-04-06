@@ -45,8 +45,8 @@ http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/em
 			</ee:message>
 			<ee:variables >
 				<ee:set-variable variableName="previousJobRun" ><![CDATA[{
-  "date": "125055",
-  "time": "112223"
+  "date": "125095",
+  "time": "154622"
 }&#93;&#93;></ee:set-variable>
 			</ee:variables>
 		</ee:transform> [STUDIO] -->
