@@ -24,7 +24,7 @@ skipNullOn="everywhere"
                             },
                           "tr":{
                                 "th": "Error Type",
-                                "td": error.errorType.asString
+                                "td": error.errorType
                             },
                           "tr":{
                                 "th": "Error Description",

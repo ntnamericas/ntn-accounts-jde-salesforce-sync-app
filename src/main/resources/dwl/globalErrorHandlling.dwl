@@ -2,7 +2,7 @@
 output application/java
 ---
 {
-	"Exception": error.exception.detailMessage ,
-	"Description" : error.description ,
-	"ErrorType" : error.errorType.asString
+	"Exception": error.description ,
+	"Description" : error.detailedDescription ,
+	"ErrorType" : error.errorType
 }

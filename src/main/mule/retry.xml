@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:tracking="http://www.mulesoft.org/schema/mule/ee/tracking" xmlns:os="http://www.mulesoft.org/schema/mule/os"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd
+http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="31b6dd94-47e5-4c9f-9c3a-7bf9f042c27f" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<flow name="retry-flow" doc:id="4de3ceb6-1b73-4b3d-8e7e-a39cc5a250b9" tracking:enable-default-events="true">
+		<http:listener doc:name="Listener" doc:id="37b2a450-368c-4d10-886c-82b68ceac7a2" config-ref="HTTP_Listener_config" path="/accounts"/>
+		<ee:transform doc:name="Transform Message" doc:id="59d06066-d93f-4d3d-9e99-a0e69567ab64" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<choice doc:name="Choice" doc:id="09f05e36-5925-493e-b40a-1ed09fbcb624" >
+			<when expression='#[upper(payload.interface) == "ACCOUNTS"]'>
+				<ee:transform doc:name="jobRunTime" doc:id="7a36fca7-ce63-4642-9520-29cdcd0f50f7">
+					<ee:message />
+					<ee:variables>
+						<ee:set-variable variableName="previousJobRun" ><![CDATA[%dw 2.0
+output application/json
+---
+{
+  "date": payload.date,
+  "time": payload.time
+}]]></ee:set-variable>
+						<ee:set-variable resource="dwl/vars-jobRun.dwl" variableName="jobRun" />
+					
+</ee:variables>
+				</ee:transform>
+				<logger level="INFO" doc:name="jobRun logger" doc:id="a44760a1-0dc7-48f0-8a46-e7e273218551" message="#[vars.jobRun]"/>
+				<logger level="INFO" doc:name="Logger2" doc:id="9c581944-8d92-4e89-a2f8-f5e43b6be830" message='#[%dw 2.0&#10;output application/java&#10;---&#10;"\n &#10;LastjobRunDetails : " ++ vars.previousJobRun.^raw]'/>
+				<logger level="INFO" doc:name="Logger" doc:id="c486d448-0eed-4359-afd0-4f898a453119" message='#["\n Calling jde-to-sf-app-sub-flow "]'/>
+				<flow-ref doc:name="Flow Reference to jde-to-sf-app-sub-flow" doc:id="50332b17-950b-4f30-a19d-7af1e8ee0b2b" name="jde-salesforce-flow"/>
+				<logger level="INFO" doc:name="Logger1" doc:id="6d13a1b6-6951-4500-952b-af69838ba1fa" message='#[%dw 2.0&#10;output application/java&#10;---&#10;&#10;"\n &#10;LastjobRunDetails-stored-to-objectStore : " ++ vars.jobRun]' />
+				<os:store doc:name="Store current job run details" doc:id="10ee4074-6106-432a-bf52-b05a2c687d01" key="previousJobRun" objectStore="Object_store_Previous_Job_Run" >
+					<os:value ><![CDATA[#[vars.jobRun]]]></os:value>
+				</os:store>
+			
+</when>
+			<otherwise >
+				<logger level="INFO" doc:name="Logger" doc:id="8c6b48a4-4f86-484a-ba54-ffe91b24d564" message='#[upper(payload.interface) ++ "interface does not exist"]'/>
+			</otherwise>
+		</choice>
+		<error-handler ref="global-error-handler" />
+	</flow>
+</mule>
