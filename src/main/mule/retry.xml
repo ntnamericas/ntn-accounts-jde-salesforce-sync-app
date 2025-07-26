@@ -39,9 +39,94 @@ output application/json
 				<logger level="INFO" doc:name="jobRun logger" doc:id="a44760a1-0dc7-48f0-8a46-e7e273218551" message="#[vars.jobRun]"/>
 				<logger level="INFO" doc:name="Logger2" doc:id="9c581944-8d92-4e89-a2f8-f5e43b6be830" message='#[%dw 2.0&#10;output application/java&#10;---&#10;"\n &#10;LastjobRunDetails : " ++ vars.previousJobRun.^raw]'/>
 				<logger level="INFO" doc:name="Logger" doc:id="c486d448-0eed-4359-afd0-4f898a453119" message='#["\n Calling jde-to-sf-app-sub-flow "]'/>
+				<ee:transform doc:name="format-sql query" doc:id="26484a11-2dec-41c5-b48d-70aba2d442f0">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output text/plain
+---
+readUrl("classpath://queryScript/sqlScript-$(p('mule.env')).dwl","text/plain")]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<ee:dynamic-evaluate doc:name="Dynamic Evaluate" doc:id="94a6aa29-52b5-4af2-bc80-3c4e68b4e363" expression="#[payload]" />
 				<flow-ref doc:name="Flow Reference to jde-to-sf-app-sub-flow" doc:id="50332b17-950b-4f30-a19d-7af1e8ee0b2b" name="jde-salesforce-flow"/>
-				<logger level="INFO" doc:name="Logger1" doc:id="6d13a1b6-6951-4500-952b-af69838ba1fa" message='#[%dw 2.0&#10;output application/java&#10;---&#10;&#10;"\n &#10;LastjobRunDetails-stored-to-objectStore : " ++ vars.jobRun]' />
+				<logger level="INFO" doc:name="Logger1" doc:id="6d13a1b6-6951-4500-952b-af69838ba1fa" message="#[%dw 2.0&#10;&#10;output application/java&#10;&#10;---&#10;&#10;&#10;&#10;&quot;\n&#10;&#10;LastjobRunDetails-stored-to-objectStore : &quot; ++ write(vars.jobRun, 'application/java')]" />
 				<os:store doc:name="Store current job run details" doc:id="10ee4074-6106-432a-bf52-b05a2c687d01" key="previousJobRun" objectStore="Object_store_Previous_Job_Run" >
+					<os:value ><![CDATA[#[vars.jobRun]]]></os:value>
+				</os:store>
+			
+</when>
+<when expression='#[upper(payload.interface) == "JDENUMBER"]'>
+				<ee:transform doc:name="jobRunTime" doc:id="53b53e20-36fb-4a45-bd27-240d38c8030e">
+					<ee:message />
+					<ee:variables>
+						<ee:set-variable variableName="previousJobRun" ><![CDATA[%dw 2.0
+output application/json
+---
+{
+  "date": payload.date,
+  "time": payload.time
+}]]></ee:set-variable>
+						<ee:set-variable resource="dwl/vars-jobRun.dwl" variableName="jobRun" />
+						<ee:set-variable variableName="jdenum" ><![CDATA[%dw 2.0
+output application/java
+---
+attributes.headers.jdenum]]></ee:set-variable>
+					
+</ee:variables>
+				</ee:transform>
+				<logger level="INFO" doc:name="jobRun logger" doc:id="a575e5da-d3c6-43b2-ba3b-9708c225a8a1" message="#[vars.jobRun]"/>
+				<logger level="INFO" doc:name="Logger2" doc:id="67c7381b-be82-4505-a98a-d5d501a492fc" message='#[%dw 2.0&#10;output application/java&#10;---&#10;"\n &#10;JDENUMBER : " ++ vars.jdenum as String]'/>
+				<logger level="INFO" doc:name="Logger" doc:id="03186aae-f008-463a-8ad1-da7449448949" message='#["\n Calling jde-to-sf-app-sub-flow "]'/>
+				<ee:transform doc:name="format-sql query" doc:id="fa668a07-0d6e-402f-95ad-411fa8b2d637">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output text/plain
+---
+readUrl("classpath://queryScript/sqlScript-AccUpdate-JDENumber-$(p('mule.env')).dwl","text/plain")]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<ee:dynamic-evaluate doc:name="Dynamic Evaluate" doc:id="ee91cac4-feac-4d98-98df-f1690a795346" expression="#[payload]" />
+				<flow-ref doc:name="Flow Reference to jde-to-sf-app-sub-flow" doc:id="6030d513-51db-4160-a05f-43c46b4198ff" name="jde-salesforce-flow"/>
+				<logger level="INFO" doc:name="Logger1" doc:id="8af3983e-ec47-471d-995b-92186c073757" message="#[%dw 2.0&#10;&#10;output application/java&#10;&#10;---&#10;&#10;&#10;&#10;&quot;\n&#10;&#10;LastjobRunDetails-stored-to-objectStore : &quot; ++ write(vars.jobRun, 'application/java')]" />
+				<os:store doc:name="Store current job run details" doc:id="24b2f851-d096-412a-ad4e-a95d7c083463" key="previousJobRun" objectStore="Object_store_Previous_Job_Run" >
+					<os:value ><![CDATA[#[vars.jobRun]]]></os:value>
+				</os:store>
+			
+</when>
+<when expression='#[upper(payload.interface) == "REPCODE"]'>
+				<ee:transform doc:name="jobRunTime" doc:id="41583978-4f18-4fca-b32c-3d8c4cae2022">
+					<ee:message />
+					<ee:variables>
+						<ee:set-variable variableName="previousJobRun" ><![CDATA[%dw 2.0
+output application/json
+---
+{
+  "date": payload.date,
+  "time": payload.time
+}]]></ee:set-variable>
+						<ee:set-variable resource="dwl/vars-jobRun.dwl" variableName="jobRun" />
+						<ee:set-variable variableName="repcode" ><![CDATA[%dw 2.0
+output application/java
+---
+attributes.headers.repcode]]></ee:set-variable>
+					
+</ee:variables>
+				</ee:transform>
+				<logger level="INFO" doc:name="jobRun logger" doc:id="13d9062e-e501-4d73-a9e4-bb1fd1b09c01" message="#[vars.jobRun]"/>
+				<logger level="INFO" doc:name="Logger2" doc:id="13f1fb1c-038d-4749-a195-94384c055190" message='#[%dw 2.0&#10;output application/java&#10;---&#10;"\n &#10;REPCODE : " ++ vars.previousJobRun.^raw]'/>
+				<logger level="INFO" doc:name="Logger" doc:id="82ed5073-a1d6-49a6-968e-859b8d40557c" message='#["\n Calling jde-to-sf-app-sub-flow "]'/>
+				<ee:transform doc:name="format-sql query" doc:id="a4673cea-42c3-4f19-84c8-475c238712e9">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output text/plain
+---
+readUrl("classpath://queryScript/sqlScript-AccUpdate-RepCode-$(p('mule.env')).dwl","text/plain")]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<ee:dynamic-evaluate doc:name="Dynamic Evaluate" doc:id="307664cd-c7eb-4717-b862-6b78a6821027" expression="#[payload]" />
+				<flow-ref doc:name="Flow Reference to jde-to-sf-app-sub-flow" doc:id="c0680c01-c26e-46fe-a3fb-0eeed52a6003" name="jde-salesforce-flow"/>
+				<logger level="INFO" doc:name="Logger1" doc:id="aa36b211-9d30-4675-bf0a-4482baa57adf" message="#[%dw 2.0&#10;&#10;output application/java&#10;&#10;---&#10;&#10;&#10;&#10;&quot;\n&#10;&#10;LastjobRunDetails-stored-to-objectStore : &quot; ++ write(vars.jobRun, 'application/java')]" />
+				<os:store doc:name="Store current job run details" doc:id="23c98e0f-08bc-4591-b4de-16a90e7bb846" key="previousJobRun" objectStore="Object_store_Previous_Job_Run" >
 					<os:value ><![CDATA[#[vars.jobRun]]]></os:value>
 				</os:store>
 			

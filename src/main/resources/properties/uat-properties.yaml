@@ -11,6 +11,8 @@ db:
   port: "1521"
   svc: "jdorclpy.netjiuwoz.vcnzgqox.oraclevcn.com"
   
+app:
+ env: "UAT"
 
 api.id: ""
 

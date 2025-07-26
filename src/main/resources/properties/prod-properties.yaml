@@ -10,7 +10,9 @@ db:
   host: "129.147.16.38"
   port: "1521"
   svc: "jdeorcl.netuenazr.vcnzgqox.oraclevcn.com"
-  
+
+app:
+ env: "PROD"  
 
 api.id: ""
 
