@@ -6,3 +6,13 @@ sf:
   token: "![1O3V3uqG9wtByGHznFQhsc1Q4BYp3HsPQbnzOU3Ieso=]"
   password: "![hRt1ri9KnH5UalfO4hI4Vg==]"
   user: "![7D6dQ58N548Rz1uJgVDECAGaYc/54LwSfl70ZboAoVs=]"
+
+salesforce:
+  consumerSecret: "![4JCZ/tP9UvTssYat4vq8ASvtVOCdjQXSAA7rCbhwDtp48I03NZJE+6poXrIoW9JabgImZYfzgFuWS4I0TSjPGfEXelO21Gk0]"
+  tokenUrl: "![m67Li978SJvXmcejyk2dQCaDoznBT98JHfuKM4pdZ3QWU72AD9AccnqOqxSsT7JlJnIG9IhcFznnbGdL41APekHbJbbH+QM7kZ3CfK1r0fU=]"
+  password: "![hRt1ri9KnH5UalfO4hI4Vg==]"
+  securityToken: "![1O3V3uqG9wtByGHznFQhsc1Q4BYp3HsPQbnzOU3Ieso=]"
+  
+smtp:
+  user: "![hRt1ri9KnH7VngaJcayGZ0D8arLBERHy1f3i+Ca4XPI=]"
+  password: "![Yk3HBzCPPp5RL3nOfWNzirX1mi98hVMs]"    

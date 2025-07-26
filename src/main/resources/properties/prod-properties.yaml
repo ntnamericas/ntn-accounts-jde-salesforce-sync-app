@@ -1,0 +1,27 @@
+http:
+  host: "0.0.0.0"
+  port: "8081"
+  timeout: "15000"
+
+sf:
+  authURL: "https://test.salesforce.com/services/Soap/u/56.0" 
+  
+db:
+  host: "129.147.16.38"
+  port: "1521"
+  svc: "jdeorcl.netuenazr.vcnzgqox.oraclevcn.com"
+
+app:
+ env: "PROD"  
+
+api.id: ""
+
+salesforce:
+  userName: "mulesoftintegration@ntnusa.com"
+  consumerKey: "3MVG9zlTNB8o8BA1T1gSt15tI0eCCfz2mZwvXlYeqAG5KoxwJdUTEkV3bZS9B5a4uMLPXa0f9WSU_7stONFky"
+
+      
+smtp:
+  host: "smtp.office365.com"
+  port: "25"  
+  to: "ntnmule@prowesssoft.com,noreply@ntnusa.com"

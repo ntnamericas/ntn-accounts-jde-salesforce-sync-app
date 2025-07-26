@@ -78,13 +78,6 @@ LEFT OUTER JOIN CRPDTA.F03012 T2
 LEFT OUTER JOIN CRPDTA.F0116  T3
   ON ABAN8 = ALAN8       
 where (t1.ABAT1 IN ('C','EU','EUX','CX','N') AND TRIM(t1.ABSIC) = 'NBCC')
-AND
-( 
-    (t1.ABUPMJ >= $(vars.previousJobRun.date) and t1.ABUPMT >= $(vars.previousJobRun.time)) OR
-    ((t2.AIUPMJ >= $(vars.previousJobRun.date) and t2.AIUPMT >= $(vars.previousJobRun.time)) AND (t2.AIPID <> 'B03B0131')) OR
-    (t3.ALUPMJ >= $(vars.previousJobRun.date)  AND t3.ALUPMT >= $(vars.previousJobRun.time)) 
-)
-
- --AND t1.ABAN8 IN(30059, 30038)
+ AND t1.ABAC04 in ($(vars.repcode))
  AND t3.aleftb = (select max(w.aleftb) from crpdta.f0116 w where w.alan8 = t3.alan8)
 ORDER BY ABAN8 DESC"

@@ -1,0 +1,19 @@
+db:
+  password: "![qShUQca+XRPO80VgwER8uQ==]"
+  user: "![7QqCW9QjsxUigvR2UPZDgw==]"
+  
+sf:
+  token: "![pxS/bMSXsKXRM/Ph2PWwFqE1Lk9fXlTzNNGx3zwfAz8=]"
+  password: "![2YNZt1lm+MRm7qkhAuEumw==]"
+  user: "![hRt1ri9KnH4qzOtJxnTIpRiC0yiHqDLpKpzaFPQu0vc=]"
+  
+salesforce:
+  consumerSecret: "![/R6rU6BCBm6HSsMJWPKTSd97S0VwGuQdqnnCRpYHdgJfJ7hb/Va5860uD6lVzmQ/95UtFnynjLulyE8DlNQGAyDIjV/aQhK2]"
+  tokenUrl: "![m67Li978SJvXmcejyk2dQFiDSi07dfdmQWnz6+TdBoG5Yum2MdVwhLq9g4HmFLfDeOSUthv3HSDCU3UpW3LNpw==]"
+  password: "![2YNZt1lm+MRm7qkhAuEumw==]"
+  securityToken: "![pxS/bMSXsKXRM/Ph2PWwFqE1Lk9fXlTzNNGx3zwfAz8=]"
+  
+  
+smtp:
+  user: "![hRt1ri9KnH7VngaJcayGZ0D8arLBERHy1f3i+Ca4XPI=]"
+  password: "![BapbFMsL0srqwUVI3ICHLlxe4IERbHKP]"    
