@@ -11,7 +11,10 @@ http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/m
 		<http:listener-connection host="0.0.0.0" port="8081" />
 	</http:listener-config>
 	<flow name="retry-flow" doc:id="4de3ceb6-1b73-4b3d-8e7e-a39cc5a250b9" tracking:enable-default-events="true">
-		<http:listener doc:name="Listener" doc:id="37b2a450-368c-4d10-886c-82b68ceac7a2" config-ref="HTTP_Listener_config" path="/accounts"/>
+		<http:listener doc:name="Listener" doc:id="37b2a450-368c-4d10-886c-82b68ceac7a2" config-ref="HTTP_Listener_config" path="/accounts">
+			<http:response statusCode='#["204"]' reasonPhrase='#["RETRY INITIATED SUCCESSFULLY"]' >
+			</http:response>
+		</http:listener>
 		<ee:transform doc:name="Transform Message" doc:id="59d06066-d93f-4d3d-9e99-a0e69567ab64" >
 			<ee:message >
 				<ee:set-payload ><![CDATA[%dw 2.0
