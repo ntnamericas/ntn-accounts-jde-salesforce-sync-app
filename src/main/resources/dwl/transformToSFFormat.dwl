@@ -47,7 +47,7 @@ payload map (record) -> {
  "Customer_Price_Group_40PC__c": record.Customer_Price_Group_40PC__c default "",
  //"Date_Account_Opened__c": record.Date_Account_Opened__c as DateTime {format: "yyyy-MM-dd'T'HH:mm:ss.SSSZ"} default "",
  //"Date_Of_Last_Credit_Review__c": record.Date_Of_Last_Credit_Review__c as DateTime {format: "yyyy-MM-dd'T'HH:mm:ss.SSSZ"}  default "",
- "Dun_Bradstreet_Rating__c": record.Dun_Bradstreet_Rating__c default "",
+ //"Dun_Bradstreet_Rating__c": record.Dun_Bradstreet_Rating__c default "",
  "Factor_Special_Payee__c": record.Factor_Special_Payee__c default "",
  "Hold_Orders_Code__c": record.Hold_Orders_Code__c default "",
  "Payment_Terms_A_R__c": record.Payment_Terms_A_R__c default "",
