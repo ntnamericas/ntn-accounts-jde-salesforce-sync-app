@@ -1,5 +1,67 @@
 {
-    "minMuleVersion": "4.6.2",
-    "javaSpecificationVersions": ["17"],
-    "secureProperties": ["encrypt.key"]
+  "configs": [
+    "global.xml",
+    "global-error-handler.xml",
+    "jde-salesforce-flow.xml",
+    "retry.xml"
+  ],
+  "secureProperties": [
+    "encrypt.key"
+  ],
+  "supportedJavaVersions": [],
+  "redeploymentEnabled": true,
+  "name": "com.ntn:ntn-accounts-jde-salesforce-sync-app:1.1.1-rc30",
+  "minMuleVersion": "4.6.2",
+  "requiredProduct": "MULE_EE",
+  "classLoaderModelLoaderDescriptor": {
+    "id": "mule",
+    "attributes": {
+      "exportedPackages": [],
+      "exportedResources": [
+        "application-types.xml",
+        "dwl/capture-payload.dwl",
+        "dwl/createPayloadForNotificationEmail.dwl",
+        "dwl/emailErrorHandling.dwl",
+        "dwl/finalMappingPayload.dwl",
+        "dwl/globalEmail.dwl",
+        "dwl/globalErrorHandlling.dwl",
+        "dwl/initial-transform.dwl",
+        "dwl/payloadAfterUpsert.dwl",
+        "dwl/transformToSFFormat.dwl",
+        "dwl/unsuccessfulLogging.dwl",
+        "dwl/vars-jobRun.dwl",
+        "dwl/vars-payloadAfterUpsert.dwl",
+        "global-error-handler.xml",
+        "global.xml",
+        "jde-salesforce-flow.xml",
+        "JDE.json",
+        "log4j2.xml",
+        "properties/common.yaml",
+        "properties/dev-properties.yaml",
+        "properties/dev-secure-properties.yaml",
+        "properties/local-properties.yaml",
+        "properties/local-secure-properties.yaml",
+        "properties/prod-properties.yaml",
+        "properties/prod-secure-properties.yaml",
+        "properties/uat-properties.yaml",
+        "properties/uat-secure-properties.yaml",
+        "queryScript/sqlScript-AccUpdate-JDENumber-prod.dwl",
+        "queryScript/sqlScript-AccUpdate-JDENumber-py.dwl",
+        "queryScript/sqlScript-AccUpdate-JDENumber-uat.dwl",
+        "queryScript/sqlScript-AccUpdate-RepCode-prod.dwl",
+        "queryScript/sqlScript-AccUpdate-RepCode-py.dwl",
+        "queryScript/sqlScript-AccUpdate-RepCode-uat.dwl",
+        "queryScript/sqlScript-dev.dwl",
+        "queryScript/sqlScript-pd.dwl",
+        "queryScript/sqlScript-prod.dwl",
+        "queryScript/sqlScript-py.dwl",
+        "queryScript/sqlScript-uat.dwl",
+        "retry.xml"
+      ]
+    }
+  },
+  "bundleDescriptorLoader": {
+    "id": "mule",
+    "attributes": {}
+  }
 }
